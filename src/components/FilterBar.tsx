@@ -1,15 +1,23 @@
+import type { ListFilters, NamedSlug } from "../types/movie";
 import "./FilterBar.css";
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: currentYear - 1969 }, (_, i) => currentYear - i);
+
+interface FilterBarProps {
+  genres?: NamedSlug[];
+  countries?: NamedSlug[];
+  value: ListFilters;
+  onChange: (value: ListFilters) => void;
+}
 
 export default function FilterBar({
   genres = [],
   countries = [],
   value,
   onChange,
-}) {
-  function set(field, val) {
+}: FilterBarProps) {
+  function set(field: keyof ListFilters, val: string) {
     onChange({ ...value, [field]: val });
   }
 

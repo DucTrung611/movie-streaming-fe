@@ -1,13 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 
+export interface UseOphimResult<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+}
+
 /**
  * useOphim(fetcherFn, deps)
  * fetcherFn: () => Promise<T>  — được gọi lại mỗi khi deps đổi
  */
-export function useOphim(fetcherFn, deps = []) {
-  const [data, setData] = useState(null);
+export function useOphim<T>(
+  fetcherFn: () => Promise<T>,
+  deps: React.DependencyList = []
+): UseOphimResult<T> {
+  const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
   const requestId = useRef(0);
 
   useEffect(() => {
@@ -24,7 +33,7 @@ export function useOphim(fetcherFn, deps = []) {
       })
       .catch((err) => {
         if (currentId === requestId.current) {
-          setError(err);
+          setError(err instanceof Error ? err : new Error(String(err)));
           setLoading(false);
         }
       });

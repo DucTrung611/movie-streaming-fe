@@ -20,7 +20,12 @@ const DOUBLE_TAP_WINDOW_MS = 300;
  * Dùng DOM thuần (không qua JSX) vì đây là node nằm ngoài tầm quản lý
  * của React (Plyr tự ý viết lại DOM quanh <video>).
  */
-function mountGestureLayer(video, { onTap }) {
+type GestureSide = "left" | "right";
+
+function mountGestureLayer(
+  video: HTMLVideoElement,
+  { onTap }: { onTap: (side: GestureSide, isDoubleTap: boolean) => void }
+): HTMLDivElement | null {
   const wrapper = video.parentElement;
   if (!wrapper) return null;
 
@@ -28,9 +33,12 @@ function mountGestureLayer(video, { onTap }) {
   layer.className = "video-gesture-layer";
   layer.setAttribute("aria-hidden", "true");
 
-  const lastTap = { side: null, time: 0 };
+  const lastTap: { side: GestureSide | null; time: number } = {
+    side: null,
+    time: 0,
+  };
 
-  function makeZone(side) {
+  function makeZone(side: GestureSide) {
     const zone = document.createElement("div");
     zone.className = "video-gesture-layer__zone";
     zone.addEventListener("click", () => {
@@ -52,7 +60,7 @@ function mountGestureLayer(video, { onTap }) {
     return zone;
   }
 
-  function showFeedback(zone, side) {
+  function showFeedback(zone: HTMLDivElement, side: GestureSide) {
     const badge = document.createElement("span");
     badge.className = "video-gesture-layer__feedback";
     badge.textContent =
@@ -83,20 +91,33 @@ function mountGestureLayer(video, { onTap }) {
  * kèm khoá màn hình ngang khi xoay máy (chỉ Android/Chrome hỗ trợ khoá
  * xoay qua JS — iOS Safari không có API này nên sẽ tự bỏ qua).
  */
-export default function VideoPlayer({ src, poster, resumeTime, onProgress }) {
-  const videoRef = useRef(null);
-  const hlsRef = useRef(null);
-  const playerRef = useRef(null);
+interface VideoPlayerProps {
+  src: string;
+  poster?: string;
+  resumeTime?: number;
+  onProgress?: (currentTime: number, duration: number) => void;
+}
+
+export default function VideoPlayer({
+  src,
+  poster,
+  resumeTime,
+  onProgress,
+}: VideoPlayerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const playerRef = useRef<Plyr | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
 
-    let handleLoadedMetadata;
-    let gestureLayerEl;
+    let handleLoadedMetadata: (() => void) | undefined;
+    let gestureLayerEl: HTMLDivElement | null = null;
+    const resumeAt = resumeTime ?? 0;
 
-    function seek(delta) {
-      if (!Number.isFinite(video.duration)) return;
+    function seek(delta: number) {
+      if (!video || !Number.isFinite(video.duration)) return;
       video.currentTime = Math.min(
         Math.max(0, video.currentTime + delta),
         video.duration
@@ -106,7 +127,8 @@ export default function VideoPlayer({ src, poster, resumeTime, onProgress }) {
     // Chạm 1 lần: hiện lại thanh điều khiển + phát tiếp nếu đang dừng
     // (lớp gesture che mất nút play to giữa màn hình của Plyr nên phải
     // tự làm thay). Chạm 2 lần liên tiếp cùng 1 bên: tua ±10s.
-    function handleGestureTap(side, isDoubleTap) {
+    function handleGestureTap(side: GestureSide, isDoubleTap: boolean) {
+      if (!video) return;
       playerRef.current?.toggleControls(true);
       if (video.paused) video.play();
       if (isDoubleTap) seek(side === "left" ? -SEEK_SECONDS : SEEK_SECONDS);
@@ -143,8 +165,8 @@ export default function VideoPlayer({ src, poster, resumeTime, onProgress }) {
         });
         gestureLayerEl = mountGestureLayer(video, { onTap: handleGestureTap });
 
-        if (resumeTime > 0) {
-          video.currentTime = resumeTime;
+        if (resumeAt > 0) {
+          video.currentTime = resumeAt;
         }
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
@@ -155,9 +177,9 @@ export default function VideoPlayer({ src, poster, resumeTime, onProgress }) {
       // Safari không có sự kiện MANIFEST_PARSED — dùng loadedmetadata
       // để biết lúc nào video đã có thời lượng, rồi mới tua tới vị trí
       // đã lưu.
-      if (resumeTime > 0) {
+      if (resumeAt > 0) {
         handleLoadedMetadata = () => {
-          video.currentTime = resumeTime;
+          video.currentTime = resumeAt;
         };
         video.addEventListener("loadedmetadata", handleLoadedMetadata);
       }

@@ -1,8 +1,20 @@
 import { Link } from "react-router-dom";
 import { resolveImageUrl } from "../utils/image";
+import type { Movie } from "../types/movie";
 import "./MovieCard.css";
 
-export default function MovieCard({ movie, cdnImageDomain }) {
+interface MovieCardProps {
+  movie: Movie & {
+    episodeSlug?: string;
+    episodeName?: string;
+    serverIndex?: number;
+    currentTime?: number;
+    duration?: number;
+  };
+  cdnImageDomain: string;
+}
+
+export default function MovieCard({ movie, cdnImageDomain }: MovieCardProps) {
   const poster = resolveImageUrl(
     movie.poster_url || movie.thumb_url,
     cdnImageDomain
@@ -18,7 +30,7 @@ export default function MovieCard({ movie, cdnImageDomain }) {
     : `/phim/${movie.slug}`;
   const progressPercent =
     isContinueWatching && movie.duration
-      ? Math.min(100, (movie.currentTime / movie.duration) * 100)
+      ? Math.min(100, ((movie.currentTime ?? 0) / movie.duration) * 100)
       : null;
 
   return (

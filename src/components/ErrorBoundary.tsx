@@ -1,4 +1,8 @@
-import { Component } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
+
+interface ErrorBoundaryState {
+  error: Error | null;
+}
 
 /**
  * Bắt lỗi runtime ở bất kỳ component con nào (VD: dữ liệu API trả về
@@ -6,14 +10,17 @@ import { Component } from "react";
  * thay vì làm trắng cả trang. Chỉ class component mới bắt được lỗi
  * render — React chưa có hook tương đương.
  */
-export default class ErrorBoundary extends Component {
-  state = { error: null };
+export default class ErrorBoundary extends Component<
+  { children: ReactNode },
+  ErrorBoundaryState
+> {
+  state: ErrorBoundaryState = { error: null };
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { error };
   }
 
-  componentDidCatch(error, info) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("Lỗi không bắt được:", error, info.componentStack);
   }
 

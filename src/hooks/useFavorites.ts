@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { readJson, writeJson, STORAGE_KEYS } from "../utils/storage";
+import type { FavoriteItem, Movie } from "../types/movie";
 
 const EVENT_NAME = "rapchieu:favorites-changed";
-const loadFavorites = () => readJson(STORAGE_KEYS.FAVORITES, []);
+const loadFavorites = (): FavoriteItem[] =>
+  readJson<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, []);
 
 /**
  * Danh sách phim yêu thích lưu local (không cần đăng nhập). Đồng bộ
@@ -11,7 +13,7 @@ const loadFavorites = () => readJson(STORAGE_KEYS.FAVORITES, []);
  * đồng bộ giữa các tab.
  */
 export function useFavorites() {
-  const [favorites, setFavorites] = useState(loadFavorites);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>(loadFavorites);
 
   useEffect(() => {
     const sync = () => setFavorites(loadFavorites());
@@ -24,11 +26,11 @@ export function useFavorites() {
   }, []);
 
   const isFavorite = useCallback(
-    (slug) => favorites.some((m) => m.slug === slug),
+    (slug: string) => favorites.some((m) => m.slug === slug),
     [favorites]
   );
 
-  const toggleFavorite = useCallback((movie) => {
+  const toggleFavorite = useCallback((movie: Movie) => {
     const current = loadFavorites();
     const exists = current.some((m) => m.slug === movie.slug);
     const next = exists

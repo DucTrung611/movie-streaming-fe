@@ -1,4 +1,11 @@
 import { apiClient, API_BASE_URL } from "./client";
+import type {
+  DetailResponse,
+  ListResponse,
+  Movie,
+  MovieType,
+  NamedSlug,
+} from "../types/movie";
 
 /**
  * LƯU Ý QUAN TRỌNG
@@ -13,12 +20,19 @@ import { apiClient, API_BASE_URL } from "./client";
  *
  * Cách kiểm tra nhanh: mở thẳng một URL bên dưới trên trình duyệt,
  * xem JSON trả về rồi đối chiếu với các hàm normalize*.
+ *
+ * apiClient bóc thẳng res.data qua interceptor (xem client.ts) nên các
+ * lời gọi apiClient.get() bên dưới thực chất trả về JSON thô — kiểu dữ
+ * liệu của nó không cố định giữa các domain nên khai báo là `unknown`
+ * và tự bóc tách bằng optional chaining trong các hàm normalize*.
  */
 
+type RawResponse = Record<string, any>;
+
 // Chuẩn hoá danh sách phim (nhiều dạng response khác nhau tuỳ endpoint)
-function normalizeListResponse(raw) {
+function normalizeListResponse(raw: RawResponse): ListResponse {
   const data = raw?.data ?? raw;
-  const items = data?.items ?? [];
+  const items: Movie[] = data?.items ?? [];
   const pagination =
     data?.params?.pagination ?? data?.pagination ?? raw?.pagination ?? {};
   const cdnImageDomain =
@@ -41,7 +55,7 @@ function normalizeListResponse(raw) {
   };
 }
 
-function normalizeDetailResponse(raw) {
+function normalizeDetailResponse(raw: RawResponse): DetailResponse {
   const movie = raw?.movie ?? raw?.data?.item ?? raw?.data ?? null;
   const episodes = raw?.episodes ?? raw?.data?.item?.episode ?? [];
   const cdnImageDomain =
@@ -50,10 +64,11 @@ function normalizeDetailResponse(raw) {
 }
 
 /** Phim mới cập nhật */
-export async function getLatestMovies(page = 1) {
-  const raw = await apiClient.get("/danh-sach/phim-moi-cap-nhat", {
-    params: { page },
-  });
+export async function getLatestMovies(page = 1): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get(
+    "/danh-sach/phim-moi-cap-nhat",
+    { params: { page } }
+  );
   return normalizeListResponse(raw);
 }
 
@@ -61,14 +76,18 @@ export async function getLatestMovies(page = 1) {
  * Danh sách theo loại: phim-bo, phim-le, tv-shows, hoat-hinh,
  * phim-vietsub, phim-thuyet-minh, phim-long-tieng
  */
-export async function getMoviesByType(typeList, params = {}) {
-  const raw = await apiClient.get(`/v1/api/danh-sach/${typeList}`, {
-    params,
-  });
+export async function getMoviesByType(
+  typeList: string,
+  params: Record<string, unknown> = {}
+): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get(
+    `/v1/api/danh-sach/${typeList}`,
+    { params }
+  );
   return normalizeListResponse(raw);
 }
 
-function normalizeSimpleListResponse(raw) {
+function normalizeSimpleListResponse(raw: RawResponse): NamedSlug[] {
   const data = raw?.data ?? raw;
   if (Array.isArray(data)) return data;
   return data?.items ?? [];
@@ -77,45 +96,63 @@ function normalizeSimpleListResponse(raw) {
 // Ẩn khỏi mọi nơi lọc theo thể loại (trang duyệt thể loại, dropdown bộ lọc...).
 const HIDDEN_GENRE_SLUGS = ["phim-18"];
 
-export async function getGenres() {
-  const raw = await apiClient.get("/v1/api/the-loai");
+export async function getGenres(): Promise<NamedSlug[]> {
+  const raw: RawResponse = await apiClient.get("/v1/api/the-loai");
   const items = normalizeSimpleListResponse(raw);
   return items.filter((g) => !HIDDEN_GENRE_SLUGS.includes(g.slug));
 }
 
-export async function getMoviesByGenre(slug, params = {}) {
-  const raw = await apiClient.get(`/v1/api/the-loai/${slug}`, { params });
+export async function getMoviesByGenre(
+  slug: string,
+  params: Record<string, unknown> = {}
+): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get(`/v1/api/the-loai/${slug}`, {
+    params,
+  });
   return normalizeListResponse(raw);
 }
 
-export async function getCountries() {
-  const raw = await apiClient.get("/v1/api/quoc-gia");
+export async function getCountries(): Promise<NamedSlug[]> {
+  const raw: RawResponse = await apiClient.get("/v1/api/quoc-gia");
   return normalizeSimpleListResponse(raw);
 }
 
-export async function getMoviesByCountry(slug, params = {}) {
-  const raw = await apiClient.get(`/v1/api/quoc-gia/${slug}`, { params });
+export async function getMoviesByCountry(
+  slug: string,
+  params: Record<string, unknown> = {}
+): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get(`/v1/api/quoc-gia/${slug}`, {
+    params,
+  });
   return normalizeListResponse(raw);
 }
 
-export async function getMoviesByYear(year, params = {}) {
-  const raw = await apiClient.get(`/v1/api/nam/${year}`, { params });
+export async function getMoviesByYear(
+  year: string | number,
+  params: Record<string, unknown> = {}
+): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get(`/v1/api/nam/${year}`, {
+    params,
+  });
   return normalizeListResponse(raw);
 }
 
-export async function searchMovies(keyword, params = {}) {
-  const raw = await apiClient.get("/v1/api/tim-kiem", {
+export async function searchMovies(
+  keyword: string,
+  params: Record<string, unknown> = {}
+): Promise<ListResponse> {
+  const raw: RawResponse = await apiClient.get("/v1/api/tim-kiem", {
     params: { keyword, ...params },
   });
   return normalizeListResponse(raw);
 }
 
-export async function getMovieDetail(slug) {
-  const raw = await apiClient.get(`/phim/${slug}`);
+export async function getMovieDetail(slug: string): Promise<DetailResponse> {
+  const raw: RawResponse = await apiClient.get(`/phim/${slug}`);
   return normalizeDetailResponse(raw);
 }
 
-export const MOVIE_TYPES = [
+export const MOVIE_TYPES: MovieType[] = [
   { slug: "phim-bo", label: "Phim bộ" },
   { slug: "phim-le", label: "Phim lẻ" },
   { slug: "hoat-hinh", label: "Hoạt hình" },

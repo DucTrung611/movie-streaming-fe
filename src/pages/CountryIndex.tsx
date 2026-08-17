@@ -4,14 +4,17 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getCountries } from "../api/ophim";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
+import type { NamedSlug } from "../types/movie";
 import "./IndexTags.css";
 
 // Quốc gia có nhiều phim/được tìm nhiều nhất — ưu tiên hiện đầu danh sách.
 const PINNED_SLUGS = ["viet-nam", "au-my", "han-quoc", "trung-quoc"];
 
-function sortPinnedFirst(items) {
+function sortPinnedFirst(items: NamedSlug[]) {
   const bySlug = new Map(items.map((c) => [c.slug, c]));
-  const pinned = PINNED_SLUGS.map((slug) => bySlug.get(slug)).filter(Boolean);
+  const pinned = PINNED_SLUGS.map((slug) => bySlug.get(slug)).filter(
+    (c): c is NamedSlug => Boolean(c)
+  );
   const rest = items.filter((c) => !PINNED_SLUGS.includes(c.slug));
   return [...pinned, ...rest];
 }

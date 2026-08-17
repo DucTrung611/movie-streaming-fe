@@ -4,16 +4,17 @@ import { useOphim } from "../hooks/useOphim";
 import { getMoviesByType, getGenres, getCountries, MOVIE_TYPES } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
 import FilterBar from "../components/FilterBar";
+import type { ListFilters } from "../types/movie";
 
 export default function ListByType() {
-  const { type } = useParams();
-  const [filters, setFilters] = useState({});
+  const { type = "" } = useParams<{ type: string }>();
+  const [filters, setFilters] = useState<ListFilters>({});
 
   const { data: genres } = useOphim(() => getGenres(), []);
   const { data: countries } = useOphim(() => getCountries(), []);
 
   const fetcher = useCallback(
-    (page) => getMoviesByType(type, { page, limit: 24, ...filters }),
+    (page: number) => getMoviesByType(type, { page, limit: 24, ...filters }),
     [type, filters]
   );
 

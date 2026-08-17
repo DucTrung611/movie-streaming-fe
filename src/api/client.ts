@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // Domain gốc của nguồn API phim (kiểu Ophim). Có thể đổi qua biến môi trường
 // VITE_API_BASE_URL nếu domain hiện tại bị chặn / đổi tên (các site dạng này
@@ -11,9 +11,12 @@ export const apiClient = axios.create({
   timeout: 15000,
 });
 
+// Interceptor bóc thẳng res.data ra — nghĩa là mọi lời gọi apiClient.get<T>()
+// thực tế trả về T (dữ liệu JSON) chứ không phải AxiosResponse<T> như kiểu
+// gốc của axios mô tả. Xem cách dùng trong src/api/ophim.ts.
 apiClient.interceptors.response.use(
   (res) => res.data,
-  (err) => {
+  (err: AxiosError<{ msg?: string }>) => {
     const message =
       err?.response?.data?.msg ||
       err?.message ||

@@ -7,7 +7,17 @@ const BLOCK_SIZE = 10;
  * đầu/cuối + "...". blockStart luôn có dạng 10k+1 nên nút lùi khối
  * luôn đáp xuống mốc chục tròn (10, 20, 30...).
  */
-export default function Pagination({ currentPage, totalPages, onChange }) {
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+}
+
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onChange,
+}: PaginationProps) {
   if (!totalPages || totalPages <= 1) return null;
 
   const page = Number(currentPage) || 1;

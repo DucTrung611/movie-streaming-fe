@@ -4,9 +4,9 @@ import { getMoviesByCountry } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
 
 export default function CountryDetail() {
-  const { slug } = useParams();
+  const { slug = "" } = useParams<{ slug: string }>();
   const fetcher = useCallback(
-    (page) => getMoviesByCountry(slug, { page, limit: 24 }),
+    (page: number) => getMoviesByCountry(slug, { page, limit: 24 }),
     [slug]
   );
 

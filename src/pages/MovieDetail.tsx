@@ -1,4 +1,6 @@
 import { Link, useParams } from "react-router-dom";
+import type { CSSProperties } from "react";
+import type { EpisodeServer, Movie } from "../types/movie";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useFavorites } from "../hooks/useFavorites";
@@ -9,7 +11,7 @@ import ErrorState from "../components/ErrorState";
 import "./MovieDetail.css";
 
 export default function MovieDetail() {
-  const { slug } = useParams();
+  const { slug = "" } = useParams<{ slug: string }>();
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
   useDocumentTitle(data?.movie?.name);
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -39,7 +41,7 @@ export default function MovieDetail() {
     <div>
       <div
         className="movie-hero"
-        style={{ "--backdrop": `url(${poster})` }}
+        style={{ "--backdrop": `url(${poster})` } as CSSProperties}
       >
         <div className="movie-hero__scrim" />
         <div className="container movie-hero__row">
@@ -76,12 +78,12 @@ export default function MovieDetail() {
                 {movie.country.map((c) => c.name).join(", ")}
               </p>
             )}
-            {movie.director?.length > 0 && (
+            {movie.director && movie.director.length > 0 && (
               <p className="movie-hero__meta">
                 <strong>Đạo diễn:</strong> {movie.director.join(", ")}
               </p>
             )}
-            {movie.actor?.length > 0 && (
+            {movie.actor && movie.actor.length > 0 && (
               <p className="movie-hero__meta">
                 <strong>Diễn viên:</strong> {movie.actor.join(", ")}
               </p>
@@ -130,7 +132,13 @@ export default function MovieDetail() {
   );
 }
 
-function EpisodeLists({ movie, episodes }) {
+function EpisodeLists({
+  movie,
+  episodes,
+}: {
+  movie: Movie;
+  episodes: EpisodeServer[] | undefined;
+}) {
   if (!episodes || episodes.length === 0) {
     return <p className="state-message">Chưa có dữ liệu tập phim.</p>;
   }

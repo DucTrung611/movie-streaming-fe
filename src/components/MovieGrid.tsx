@@ -1,7 +1,13 @@
 import MovieCard from "./MovieCard";
+import type { Movie } from "../types/movie";
 import "./MovieGrid.css";
 
-export default function MovieGrid({ movies, cdnImageDomain }) {
+interface MovieGridProps {
+  movies: Movie[] | null | undefined;
+  cdnImageDomain: string;
+}
+
+export default function MovieGrid({ movies, cdnImageDomain }: MovieGridProps) {
   if (!movies || movies.length === 0) {
     return <p className="state-message">Không tìm thấy phim nào.</p>;
   }

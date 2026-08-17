@@ -8,7 +8,7 @@ export default function Search() {
   const keyword = searchParams.get("keyword") || "";
 
   const fetcher = useCallback(
-    (page) => searchMovies(keyword, { page, limit: 24 }),
+    (page: number) => searchMovies(keyword, { page, limit: 24 }),
     [keyword]
   );
 

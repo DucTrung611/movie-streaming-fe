@@ -7,6 +7,7 @@ import MovieGrid from "../components/MovieGrid";
 import ContinueWatchingSection from "../components/ContinueWatchingSection";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
+import type { ListResponse } from "../types/movie";
 import "./Home.css";
 
 const SECTIONS = [
@@ -31,7 +32,15 @@ export default function Home() {
   );
 }
 
-function ReelHero({ data, loading, error }) {
+function ReelHero({
+  data,
+  loading,
+  error,
+}: {
+  data: ListResponse | null;
+  loading: boolean;
+  error: Error | null;
+}) {
   const items = data?.items?.slice(0, 10) || [];
 
   return (
@@ -56,7 +65,7 @@ function ReelHero({ data, loading, error }) {
               <img
                 src={resolveImageUrl(
                   movie.poster_url || movie.thumb_url,
-                  data.cdnImageDomain
+                  data?.cdnImageDomain
                 )}
                 alt={movie.name}
                 loading="lazy"
@@ -76,7 +85,15 @@ function ReelHero({ data, loading, error }) {
   );
 }
 
-function TypeSection({ type, eyebrow, title }) {
+function TypeSection({
+  type,
+  eyebrow,
+  title,
+}: {
+  type: string;
+  eyebrow: string;
+  title: string;
+}) {
   const { data, loading, error } = useOphim(
     () => getMoviesByType(type, { page: 1, limit: 12 }),
     [type]
@@ -98,8 +115,8 @@ function TypeSection({ type, eyebrow, title }) {
       {error && <ErrorState message={error.message} />}
       {!loading && !error && (
         <MovieGrid
-          movies={data.items.slice(0, 12)}
-          cdnImageDomain={data.cdnImageDomain}
+          movies={data!.items.slice(0, 12)}
+          cdnImageDomain={data!.cdnImageDomain}
         />
       )}
     </section>

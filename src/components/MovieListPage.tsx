@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
@@ -6,6 +6,15 @@ import MovieGrid from "./MovieGrid";
 import Pagination from "./Pagination";
 import Loader from "./Loader";
 import ErrorState from "./ErrorState";
+import type { ListResponse } from "../types/movie";
+
+interface MovieListPageProps {
+  eyebrow?: string;
+  title: string;
+  fetcher: (page: number) => Promise<ListResponse>;
+  deps?: React.DependencyList;
+  filterSlot?: ReactNode;
+}
 
 /**
  * Khung trang danh sách phim dùng chung cho: danh sách theo loại,
@@ -19,7 +28,13 @@ import ErrorState from "./ErrorState";
  * (kèm ?page=) và danh sách hiện lại đúng trang đang xem dở, thay vì
  * component mount lại từ đầu và luôn về trang 1.
  */
-export default function MovieListPage({ eyebrow, title, fetcher, deps = [], filterSlot }) {
+export default function MovieListPage({
+  eyebrow,
+  title,
+  fetcher,
+  deps = [],
+  filterSlot,
+}: MovieListPageProps) {
   useDocumentTitle(title);
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
@@ -49,7 +64,7 @@ export default function MovieListPage({ eyebrow, title, fetcher, deps = [], filt
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const { data, loading, error } = useOphim(() => fetcher(page), [page, ...deps]);
 
-  function handlePageChange(nextPage) {
+  function handlePageChange(nextPage: number) {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set("page", String(nextPage));

@@ -4,9 +4,9 @@ import { getMoviesByGenre } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
 
 export default function GenreDetail() {
-  const { slug } = useParams();
+  const { slug = "" } = useParams<{ slug: string }>();
   const fetcher = useCallback(
-    (page) => getMoviesByGenre(slug, { page, limit: 24 }),
+    (page: number) => getMoviesByGenre(slug, { page, limit: 24 }),
     [slug]
   );
 

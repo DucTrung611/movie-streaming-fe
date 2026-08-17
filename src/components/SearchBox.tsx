@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SearchBox({ className = "" }) {
+export default function SearchBox({ className = "" }: { className?: string }) {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const trimmed = keyword.trim();
     if (!trimmed) return;

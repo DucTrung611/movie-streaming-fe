@@ -11,7 +11,10 @@ import ErrorState from "../components/ErrorState";
 import "./Watch.css";
 
 export default function Watch() {
-  const { slug, episodeSlug } = useParams();
+  const { slug = "", episodeSlug } = useParams<{
+    slug: string;
+    episodeSlug: string;
+  }>();
   const [searchParams] = useSearchParams();
   const serverIndex = Number(searchParams.get("server") || 0);
 
@@ -54,7 +57,7 @@ export default function Watch() {
       : 0;
 
   const handleProgress = useCallback(
-    (currentTime, duration) => {
+    (currentTime: number, duration: number) => {
       if (!movie || !episode) return;
       saveProgress({
         slug: movie.slug,
@@ -121,7 +124,7 @@ export default function Watch() {
       </div>
 
       <div className="watch-page__servers">
-        {episodes.map((s, i) => (
+        {episodes!.map((s, i) => (
           <Link
             key={s.server_name}
             to={`/xem-phim/${movie.slug}/${
@@ -138,7 +141,7 @@ export default function Watch() {
       </div>
 
       <div className="episode-list watch-page__episodes">
-        {server.server_data.map((ep) => (
+        {server!.server_data.map((ep) => (
           <Link
             key={ep.slug}
             to={`/xem-phim/${movie.slug}/${ep.slug}?server=${serverIndex}`}
