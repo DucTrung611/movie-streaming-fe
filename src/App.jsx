@@ -10,6 +10,7 @@ import CountryIndex from "./pages/CountryIndex";
 import CountryDetail from "./pages/CountryDetail";
 import Search from "./pages/Search";
 import MovieDetail from "./pages/MovieDetail";
+import Favorites from "./pages/Favorites";
 import Watch from "./pages/Watch";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/quoc-gia" element={<CountryIndex />} />
             <Route path="/quoc-gia/:slug" element={<CountryDetail />} />
             <Route path="/tim-kiem" element={<Search />} />
+            <Route path="/yeu-thich" element={<Favorites />} />
             <Route path="/phim/:slug" element={<MovieDetail />} />
             <Route path="/xem-phim/:slug/:episodeSlug" element={<Watch />} />
             <Route path="*" element={<NotFound />} />

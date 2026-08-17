@@ -1,7 +1,10 @@
+import { useCallback, useMemo } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { useContinueWatching } from "../hooks/useContinueWatching";
 import { getMovieDetail } from "../api/ophim";
+import { resolveImageUrl } from "../utils/image";
 import VideoPlayer from "../components/VideoPlayer";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
@@ -15,26 +18,69 @@ export default function Watch() {
   // Chỉ phụ thuộc slug — chuyển tập/server không fetch lại toàn bộ phim.
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
 
-  const movieForTitle = data?.movie;
-  const episodeForTitle = movieForTitle
-    ? data.episodes
-        .flatMap((s) => s.server_data)
-        .find((e) => e.slug === episodeSlug)
+  // Mọi hook phải gọi trước các early return bên dưới (quy tắc hook của
+  // React), nên dùng optional chaining trên `data` thay vì destructure.
+  const movie = data?.movie;
+  const episodes = data?.episodes;
+  const cdnImageDomain = data?.cdnImageDomain;
+
+  const episodeForTitle = movie
+    ? episodes?.flatMap((s) => s.server_data).find((e) => e.slug === episodeSlug)
     : null;
   useDocumentTitle(
-    movieForTitle &&
-      `${episodeForTitle?.name || ""} ${movieForTitle.name}`.trim()
+    movie && `${episodeForTitle?.name || ""} ${movie.name}`.trim()
+  );
+
+  const poster = movie
+    ? resolveImageUrl(movie.thumb_url || movie.poster_url, cdnImageDomain)
+    : "";
+
+  const { getSavedProgress, saveProgress } = useContinueWatching();
+
+  const server = episodes ? episodes[serverIndex] || episodes[0] : null;
+  const episode =
+    server?.server_data?.find((e) => e.slug === episodeSlug) ||
+    server?.server_data?.[0];
+
+  // Chỉ đọc vị trí đã lưu 1 lần lúc mount/đổi phim — không phụ thuộc
+  // vào tiến trình đang được ghi định kỳ, tránh VideoPlayer bị tua lại.
+  const resumeEntry = useMemo(
+    () => (movie ? getSavedProgress(movie.slug) : undefined),
+    [getSavedProgress, movie?.slug]
+  );
+  const resumeTime =
+    resumeEntry && episode && resumeEntry.episodeSlug === episode.slug
+      ? resumeEntry.currentTime
+      : 0;
+
+  const handleProgress = useCallback(
+    (currentTime, duration) => {
+      if (!movie || !episode) return;
+      saveProgress({
+        slug: movie.slug,
+        name: movie.name,
+        poster_url: poster,
+        episodeSlug: episode.slug,
+        episodeName: episode.name,
+        serverIndex,
+        currentTime,
+        duration,
+      });
+    },
+    [
+      saveProgress,
+      movie?.slug,
+      movie?.name,
+      poster,
+      episode?.slug,
+      episode?.name,
+      serverIndex,
+    ]
   );
 
   if (loading) return <Loader />;
   if (error) return <ErrorState message={error.message} />;
-  if (!data?.movie) return <ErrorState message="Không tìm thấy phim." />;
-
-  const { movie, episodes } = data;
-  const server = episodes[serverIndex] || episodes[0];
-  const episode =
-    server?.server_data?.find((e) => e.slug === episodeSlug) ||
-    server?.server_data?.[0];
+  if (!movie) return <ErrorState message="Không tìm thấy phim." />;
 
   if (!episode) {
     return <ErrorState message="Không tìm thấy tập phim này." />;
@@ -52,7 +98,12 @@ export default function Watch() {
       <div className="watch-page__player">
         <div className="film-rail" aria-hidden="true" />
         {episode.link_m3u8 ? (
-          <VideoPlayer src={episode.link_m3u8} />
+          <VideoPlayer
+            src={episode.link_m3u8}
+            poster={poster}
+            resumeTime={resumeTime}
+            onProgress={handleProgress}
+          />
         ) : episode.link_embed ? (
           <iframe
             className="watch-page__iframe"

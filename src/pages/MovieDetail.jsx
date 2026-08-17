@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { useFavorites } from "../hooks/useFavorites";
 import { getMovieDetail } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
 import Loader from "../components/Loader";
@@ -11,6 +12,7 @@ export default function MovieDetail() {
   const { slug } = useParams();
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
   useDocumentTitle(data?.movie?.name);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   if (loading) return <Loader />;
   if (error) return <ErrorState message={error.message} />;
@@ -19,6 +21,19 @@ export default function MovieDetail() {
   const { movie, episodes, cdnImageDomain } = data;
   const poster = resolveImageUrl(movie.thumb_url || movie.poster_url, cdnImageDomain);
   const firstEpisode = episodes?.[0]?.server_data?.[0];
+  const favorited = isFavorite(movie.slug);
+
+  function handleToggleFavorite() {
+    toggleFavorite({
+      _id: movie._id,
+      slug: movie.slug,
+      name: movie.name,
+      origin_name: movie.origin_name,
+      year: movie.year,
+      poster_url: poster,
+      episode_current: movie.episode_current,
+    });
+  }
 
   return (
     <div>
@@ -79,14 +94,26 @@ export default function MovieDetail() {
               />
             )}
 
-            {firstEpisode && (
-              <Link
-                to={`/xem-phim/${movie.slug}/${firstEpisode.slug}?server=0`}
-                className="btn btn-primary"
+            <div className="movie-hero__actions">
+              {firstEpisode && (
+                <Link
+                  to={`/xem-phim/${movie.slug}/${firstEpisode.slug}?server=0`}
+                  className="btn btn-primary"
+                >
+                  ▶ Xem phim
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                aria-pressed={favorited}
+                className={`btn btn-outline favorite-toggle${
+                  favorited ? " is-active" : ""
+                }`}
               >
-                ▶ Xem phim
-              </Link>
-            )}
+                {favorited ? "♥ Đã lưu" : "♡ Yêu thích"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getLatestMovies, getMoviesByType } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
 import MovieGrid from "../components/MovieGrid";
+import ContinueWatchingSection from "../components/ContinueWatchingSection";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import "./Home.css";
@@ -21,6 +22,7 @@ export default function Home() {
   return (
     <div>
       <ReelHero data={data} loading={loading} error={error} />
+      <ContinueWatchingSection />
 
       {SECTIONS.map((s) => (
         <TypeSection key={s.type} {...s} />

@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { to: "/danh-sach/tv-shows", label: "TV Shows" },
   { to: "/the-loai", label: "Thể loại" },
   { to: "/quoc-gia", label: "Quốc gia" },
+  { to: "/yeu-thich", label: "Yêu thích" },
 ];
 
 export default function Header() {

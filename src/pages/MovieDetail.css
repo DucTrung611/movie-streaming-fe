@@ -78,6 +78,19 @@
   max-width: 70ch;
 }
 
+.movie-hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.favorite-toggle.is-active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(232, 178, 61, 0.12);
+}
+
 @media (max-width: 680px) {
   .movie-hero__row {
     flex-direction: column;

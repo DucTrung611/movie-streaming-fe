@@ -12,7 +12,7 @@ import "./VideoPlayer.css";
  * hls.js vì một số bản Chrome báo canPlayType(...) là "maybe" dù thực
  * tế không phát được HLS gốc.
  */
-export default function VideoPlayer({ src, poster }) {
+export default function VideoPlayer({ src, poster, resumeTime, onProgress }) {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const playerRef = useRef(null);
@@ -20,6 +20,8 @@ export default function VideoPlayer({ src, poster }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
+
+    let handleLoadedMetadata;
 
     if (Hls.isSupported()) {
       const hls = new Hls();
@@ -50,18 +52,61 @@ export default function VideoPlayer({ src, poster }) {
           },
           i18n: { qualityLabel: { 0: "Tự động" } },
         });
+
+        if (resumeTime > 0) {
+          video.currentTime = resumeTime;
+        }
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       playerRef.current = new Plyr(video);
+
+      // Safari không có sự kiện MANIFEST_PARSED — dùng loadedmetadata
+      // để biết lúc nào video đã có thời lượng, rồi mới tua tới vị trí
+      // đã lưu.
+      if (resumeTime > 0) {
+        handleLoadedMetadata = () => {
+          video.currentTime = resumeTime;
+        };
+        video.addEventListener("loadedmetadata", handleLoadedMetadata);
+      }
     }
 
+    // Lưu tiến trình xem: throttle timeupdate (tối đa mỗi 5s) để không
+    // ghi localStorage liên tục; luôn lưu ngay khi pause để không mất
+    // vị trí lúc người dùng dừng xem.
+    let lastSavedTime = 0;
+    const handleTimeUpdate = () => {
+      if (!onProgress) return;
+      const { currentTime, duration } = video;
+      if (!Number.isFinite(duration) || duration <= 0) return;
+      if (currentTime - lastSavedTime < 5) return;
+      lastSavedTime = currentTime;
+      onProgress(currentTime, duration);
+    };
+    const handlePause = () => {
+      if (!onProgress) return;
+      const { currentTime, duration } = video;
+      if (Number.isFinite(duration) && duration > 0) {
+        onProgress(currentTime, duration);
+      }
+    };
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("pause", handlePause);
+
     return () => {
+      handlePause(); // lưu vị trí lần cuối trước khi đổi tập/rời trang
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("pause", handlePause);
+      if (handleLoadedMetadata) {
+        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      }
       playerRef.current?.destroy();
       playerRef.current = null;
       hlsRef.current?.destroy();
       hlsRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   return (
