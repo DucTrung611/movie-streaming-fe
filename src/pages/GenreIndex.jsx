@@ -6,9 +6,6 @@ import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import "./IndexTags.css";
 
-// Ẩn thể loại nhạy cảm khỏi trang duyệt thể loại.
-const HIDDEN_SLUGS = ["phim-18"];
-
 export default function GenreIndex() {
   useDocumentTitle("Thể loại");
   const { data, loading, error } = useOphim(() => getGenres(), []);
@@ -25,9 +22,7 @@ export default function GenreIndex() {
       {error && <ErrorState message={error.message} />}
       {!loading && !error && (
         <div className="tag-grid">
-          {(data || [])
-            .filter((g) => !HIDDEN_SLUGS.includes(g.slug))
-            .map((g) => (
+          {(data || []).map((g) => (
             <Link key={g.slug} to={`/the-loai/${g.slug}`} className="tag-chip">
               {g.name}
             </Link>

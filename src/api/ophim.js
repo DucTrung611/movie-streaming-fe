@@ -74,9 +74,13 @@ function normalizeSimpleListResponse(raw) {
   return data?.items ?? [];
 }
 
+// Ẩn khỏi mọi nơi lọc theo thể loại (trang duyệt thể loại, dropdown bộ lọc...).
+const HIDDEN_GENRE_SLUGS = ["phim-18"];
+
 export async function getGenres() {
   const raw = await apiClient.get("/v1/api/the-loai");
-  return normalizeSimpleListResponse(raw);
+  const items = normalizeSimpleListResponse(raw);
+  return items.filter((g) => !HIDDEN_GENRE_SLUGS.includes(g.slug));
 }
 
 export async function getMoviesByGenre(slug, params = {}) {
