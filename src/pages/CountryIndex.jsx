@@ -7,7 +7,7 @@ import ErrorState from "../components/ErrorState";
 import "./IndexTags.css";
 
 // Quốc gia có nhiều phim/được tìm nhiều nhất — ưu tiên hiện đầu danh sách.
-const PINNED_SLUGS = ["au-my", "han-quoc", "trung-quoc"];
+const PINNED_SLUGS = ["viet-nam", "au-my", "han-quoc", "trung-quoc"];
 
 function sortPinnedFirst(items) {
   const bySlug = new Map(items.map((c) => [c.slug, c]));
