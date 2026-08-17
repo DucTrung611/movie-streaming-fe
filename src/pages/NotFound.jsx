@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function NotFound() {
+  useDocumentTitle("Không tìm thấy trang");
   return (
     <div className="section container" style={{ textAlign: "center", padding: "100px 20px" }}>
       <span className="eyebrow">404</span>

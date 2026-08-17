@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Home from "./pages/Home";
 import ListByType from "./pages/ListByType";
 import GenreIndex from "./pages/GenreIndex";
@@ -17,18 +18,20 @@ export default function App() {
     <>
       <Header />
       <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/danh-sach/:type" element={<ListByType />} />
-          <Route path="/the-loai" element={<GenreIndex />} />
-          <Route path="/the-loai/:slug" element={<GenreDetail />} />
-          <Route path="/quoc-gia" element={<CountryIndex />} />
-          <Route path="/quoc-gia/:slug" element={<CountryDetail />} />
-          <Route path="/tim-kiem" element={<Search />} />
-          <Route path="/phim/:slug" element={<MovieDetail />} />
-          <Route path="/xem-phim/:slug/:episodeSlug" element={<Watch />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/danh-sach/:type" element={<ListByType />} />
+            <Route path="/the-loai" element={<GenreIndex />} />
+            <Route path="/the-loai/:slug" element={<GenreDetail />} />
+            <Route path="/quoc-gia" element={<CountryIndex />} />
+            <Route path="/quoc-gia/:slug" element={<CountryDetail />} />
+            <Route path="/tim-kiem" element={<Search />} />
+            <Route path="/phim/:slug" element={<MovieDetail />} />
+            <Route path="/xem-phim/:slug/:episodeSlug" element={<Watch />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
       <Footer />
     </>

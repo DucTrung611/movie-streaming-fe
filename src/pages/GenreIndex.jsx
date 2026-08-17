@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getGenres } from "../api/ophim";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import "./IndexTags.css";
 
 export default function GenreIndex() {
+  useDocumentTitle("Thể loại");
   const { data, loading, error } = useOphim(() => getGenres(), []);
 
   return (

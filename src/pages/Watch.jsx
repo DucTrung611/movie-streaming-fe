@@ -1,5 +1,6 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getMovieDetail } from "../api/ophim";
 import VideoPlayer from "../components/VideoPlayer";
 import Loader from "../components/Loader";
@@ -13,6 +14,17 @@ export default function Watch() {
 
   // Chỉ phụ thuộc slug — chuyển tập/server không fetch lại toàn bộ phim.
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
+
+  const movieForTitle = data?.movie;
+  const episodeForTitle = movieForTitle
+    ? data.episodes
+        .flatMap((s) => s.server_data)
+        .find((e) => e.slug === episodeSlug)
+    : null;
+  useDocumentTitle(
+    movieForTitle &&
+      `${episodeForTitle?.name || ""} ${movieForTitle.name}`.trim()
+  );
 
   if (loading) return <Loader />;
   if (error) return <ErrorState message={error.message} />;

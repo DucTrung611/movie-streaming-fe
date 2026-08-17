@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getCountries } from "../api/ophim";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import "./IndexTags.css";
 
 export default function CountryIndex() {
+  useDocumentTitle("Quốc gia");
   const { data, loading, error } = useOphim(() => getCountries(), []);
 
   return (

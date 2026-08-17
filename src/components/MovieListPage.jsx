@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import MovieGrid from "./MovieGrid";
 import Pagination from "./Pagination";
 import Loader from "./Loader";
@@ -13,6 +14,7 @@ import ErrorState from "./ErrorState";
  * deps: mảng dependency — đổi khi slug/keyword đổi để reset trang về 1
  */
 export default function MovieListPage({ eyebrow, title, fetcher, deps = [], filterSlot }) {
+  useDocumentTitle(title);
   const [page, setPage] = useState(1);
 
   // Khi slug/keyword/bộ lọc đổi (deps đổi), quay lại trang 1.

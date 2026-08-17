@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getMovieDetail } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
 import Loader from "../components/Loader";
@@ -9,6 +10,7 @@ import "./MovieDetail.css";
 export default function MovieDetail() {
   const { slug } = useParams();
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
+  useDocumentTitle(data?.movie?.name);
 
   if (loading) return <Loader />;
   if (error) return <ErrorState message={error.message} />;

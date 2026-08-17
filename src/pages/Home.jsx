@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getLatestMovies, getMoviesByType } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
 import MovieGrid from "../components/MovieGrid";
@@ -14,6 +15,7 @@ const SECTIONS = [
 ];
 
 export default function Home() {
+  useDocumentTitle();
   const { data, loading, error } = useOphim(() => getLatestMovies(1), []);
 
   return (
