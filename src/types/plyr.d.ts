@@ -9,6 +9,7 @@ declare module "plyr" {
   }
 
   interface PlyrOptions {
+    controls?: string[];
     quality?: PlyrQualityOptions;
     i18n?: Record<string, unknown>;
   }

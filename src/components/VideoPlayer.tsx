@@ -7,6 +7,21 @@ import "./VideoPlayer.css";
 const SEEK_SECONDS = 10;
 const DOUBLE_TAP_WINDOW_MS = 300;
 
+// Trên điện thoại, bỏ nút loa/thanh âm lượng của Plyr — người dùng
+// chỉnh âm lượng bằng nút cứng của máy sẽ nhanh và quen thuộc hơn.
+// Âm lượng video mặc định giữ nguyên 100% (mức mặc định của Plyr).
+const TOUCH_CONTROLS = [
+  "play-large",
+  "play",
+  "progress",
+  "current-time",
+  "captions",
+  "settings",
+  "pip",
+  "airplay",
+  "fullscreen",
+];
+
 /**
  * Gắn lớp bắt cử chỉ chạm đúp ±10s vào ĐÚNG bên trong DOM mà Plyr tự
  * dựng lên (video.parentElement, tức .plyr__video-wrapper) — chứ
@@ -57,6 +72,13 @@ function mountGestureLayer(
         lastTap.time = now;
       }
     });
+    // Plyr tự lắng nghe "dblclick" trên container để bật/tắt toàn màn
+    // hình (xem plyr/dist/plyr.js, fullscreen.js). Sự kiện dblclick của
+    // trình duyệt vẫn nổi bọt lên container dù ta chỉ bắt "click" ở
+    // trên — nếu không chặn, chạm đúp để tua sẽ vô tình kích hoạt luôn
+    // toàn màn hình (và khoá xoay ngang đi kèm). Chặn nổi bọt ở đây để
+    // chạm đúp chỉ tua, không xoay/toàn màn hình.
+    zone.addEventListener("dblclick", (event) => event.stopPropagation());
     return zone;
   }
 
@@ -115,6 +137,7 @@ export default function VideoPlayer({
     let handleLoadedMetadata: (() => void) | undefined;
     let gestureLayerEl: HTMLDivElement | null = null;
     const resumeAt = resumeTime ?? 0;
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
     function seek(delta: number) {
       if (!video || !Number.isFinite(video.duration)) return;
@@ -146,6 +169,7 @@ export default function VideoPlayer({
         );
 
         playerRef.current = new Plyr(video, {
+          controls: isTouch ? TOUCH_CONTROLS : undefined,
           quality: {
             default: 0,
             options: [0, ...heights],
@@ -171,7 +195,9 @@ export default function VideoPlayer({
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      playerRef.current = new Plyr(video);
+      playerRef.current = new Plyr(video, {
+        controls: isTouch ? TOUCH_CONTROLS : undefined,
+      });
       gestureLayerEl = mountGestureLayer(video, { onTap: handleGestureTap });
 
       // Safari không có sự kiện MANIFEST_PARSED — dùng loadedmetadata
