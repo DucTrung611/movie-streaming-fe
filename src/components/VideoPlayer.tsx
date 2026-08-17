@@ -196,6 +196,12 @@ export default function VideoPlayer({
           // trên desktop, nó sẽ GHI ĐÈ mất bộ điều khiển mặc định đầy
           // đủ của Plyr bằng rỗng, làm mất hẳn thanh điều khiển video.
           ...(isTouch ? { controls: TOUCH_CONTROLS } : {}),
+          // iosNative: true bắt Plyr dùng webkitEnterFullscreen() — trình
+          // toàn màn hình gốc của iOS — thay vì tự vẽ toàn màn hình bằng
+          // CSS (mặc định của Plyr). Chỉ trình toàn màn hình gốc mới tự
+          // xoay ngang theo nội dung video khi xoay máy; kiểu "giả toàn
+          // màn hình" bằng CSS không có khả năng này trên Safari/iOS.
+          fullscreen: { iosNative: true },
           quality: {
             default: 0,
             options: [0, ...heights],
@@ -251,6 +257,10 @@ export default function VideoPlayer({
       video.src = src;
       playerRef.current = new Plyr(video, {
         ...(isTouch ? { controls: TOUCH_CONTROLS } : {}),
+        // Nhánh này chạy trên Safari/iOS thật (không hỗ trợ hls.js qua
+        // MSE) — bật toàn màn hình gốc để có thể tự xoay ngang khi xoay
+        // máy, xem giải thích ở nhánh Hls.isSupported() phía trên.
+        fullscreen: { iosNative: true },
       });
       gestureLayerEl = mountGestureLayer(video, { onTap: handleGestureTap });
 
