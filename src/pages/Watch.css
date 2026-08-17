@@ -1,0 +1,61 @@
+.watch-page__header {
+  margin-bottom: 16px;
+}
+
+.watch-page__header h1 {
+  font-size: 24px;
+  margin-top: 6px;
+}
+
+.watch-page__player {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+}
+
+.watch-page__iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  display: block;
+}
+
+.watch-page__servers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 16px;
+}
+
+.server-tab {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.server-tab:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+.server-tab.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #14100a;
+  font-weight: 600;
+}
+
+.watch-page__episodes {
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+.episode-chip.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #14100a;
+}

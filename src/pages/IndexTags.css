@@ -1,0 +1,20 @@
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-chip {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+}
+
+.tag-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}

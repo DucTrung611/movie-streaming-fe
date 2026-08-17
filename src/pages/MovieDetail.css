@@ -1,0 +1,122 @@
+.movie-hero {
+  position: relative;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.movie-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--backdrop);
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(28px) brightness(0.35);
+  transform: scale(1.15);
+}
+
+.movie-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 15, 20, 0.4) 0%,
+    var(--bg-elevated) 92%
+  );
+}
+
+.movie-hero__row {
+  position: relative;
+  display: flex;
+  gap: 32px;
+  padding: 40px 20px;
+  align-items: flex-start;
+}
+
+.movie-hero__poster {
+  width: 220px;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.movie-hero__info h1 {
+  font-size: 32px;
+  margin: 6px 0 4px;
+}
+
+.movie-hero__original {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 14px;
+}
+
+.movie-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.movie-hero__meta {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+}
+
+.movie-hero__meta strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.movie-hero__content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 14px 0 22px;
+  max-width: 70ch;
+}
+
+@media (max-width: 680px) {
+  .movie-hero__row {
+    flex-direction: column;
+  }
+  .movie-hero__poster {
+    width: 150px;
+  }
+}
+
+/* ---- episodes ---- */
+.episode-servers {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.episode-server__name {
+  font-size: 15px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.episode-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.episode-chip {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+}
+
+.episode-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}

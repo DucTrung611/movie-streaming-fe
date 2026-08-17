@@ -1,0 +1,16 @@
+.video-player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  display: block;
+}
+
+.plyr {
+  --plyr-color-main: var(--gold);
+  --plyr-video-background: #000;
+  --plyr-menu-background: var(--bg-elevated);
+  --plyr-menu-color: var(--text);
+  --plyr-menu-radius: var(--radius);
+  --plyr-control-radius: var(--radius);
+  aspect-ratio: 16 / 9;
+}
