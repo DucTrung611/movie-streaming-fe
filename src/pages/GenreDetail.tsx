@@ -2,7 +2,9 @@ import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getMoviesByGenre } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
+import NotFound from "./NotFound";
 import { sortMoviesByYear } from "../utils/sortMovies";
+import { BLOCKED_CATEGORY_SLUGS } from "../utils/contentFilter";
 
 export default function GenreDetail() {
   const { slug = "" } = useParams<{ slug: string }>();
@@ -14,6 +16,8 @@ export default function GenreDetail() {
       })),
     [slug]
   );
+
+  if (BLOCKED_CATEGORY_SLUGS.includes(slug)) return <NotFound />;
 
   return (
     <MovieListPage

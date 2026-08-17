@@ -1,8 +1,32 @@
+.video-player-wrap {
+  position: relative;
+}
+
 .video-player {
   width: 100%;
   aspect-ratio: 16 / 9;
   background: #000;
   display: block;
+}
+
+.video-player__error {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.video-player__error p {
+  max-width: 40ch;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* Lớp trong suốt bắt cử chỉ chạm đúp tua ±10s — được VideoPlayer.jsx

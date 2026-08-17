@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import Plyr from "plyr";
 import "plyr/dist/plyr.css";
@@ -118,26 +118,46 @@ interface VideoPlayerProps {
   poster?: string;
   resumeTime?: number;
   onProgress?: (currentTime: number, duration: number) => void;
+  /** Gọi khi việc phát bị lỗi không thể tự phục hồi (link hỏng, bị chặn
+   * hotlink, mạng chập chờn quá số lần thử lại...) — nơi gọi component
+   * này có thể chuyển sang server/nguồn phát khác. */
+  onFatalError?: () => void;
 }
+
+const PLAYBACK_ERROR_MESSAGE =
+  "Không phát được video. Vui lòng thử server khác hoặc tải lại trang.";
 
 export default function VideoPlayer({
   src,
   poster,
   resumeTime,
   onProgress,
+  onFatalError,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const playerRef = useRef<Plyr | null>(null);
+  const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
 
+    setPlaybackError(null);
     let handleLoadedMetadata: (() => void) | undefined;
     let gestureLayerEl: HTMLDivElement | null = null;
     const resumeAt = resumeTime ?? 0;
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    // hls.js có thể tự phục hồi lỗi mạng bằng cách nạp lại — nhưng nếu
+    // lỗi lặp lại liên tục (link chết hẳn, không phải chập chờn tạm
+    // thời) thì phải dừng thử và báo lỗi thay vì lặp vô hạn.
+    let networkRetryCount = 0;
+    const MAX_NETWORK_RETRIES = 3;
+
+    function reportFatalError() {
+      setPlaybackError(PLAYBACK_ERROR_MESSAGE);
+      onFatalError?.();
+    }
 
     function seek(delta: number) {
       if (!video || !Number.isFinite(video.duration)) return;
@@ -193,6 +213,34 @@ export default function VideoPlayer({
           video.currentTime = resumeAt;
         }
       });
+
+      // Trước đây không có handler nào cho Hls.Events.ERROR — bất kỳ lỗi
+      // mạng/media nào (đứt mạng lúc tải segment, link bị chặn hotlink,
+      // manifest hỏng...) đều khiến trình phát đứng hình lặng lẽ, không
+      // có cách phục hồi lẫn thông báo cho người xem. Giờ tự thử tải lại
+      // khi lỗi mạng, tự phục hồi khi lỗi media, và chỉ báo lỗi hẳn khi
+      // đã thử hết cách hoặc gặp lỗi không thể phục hồi.
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (!data.fatal) return;
+        switch (data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            networkRetryCount += 1;
+            if (networkRetryCount <= MAX_NETWORK_RETRIES) {
+              hls.startLoad();
+            } else {
+              hls.destroy();
+              reportFatalError();
+            }
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            hls.recoverMediaError();
+            break;
+          default:
+            hls.destroy();
+            reportFatalError();
+            break;
+        }
+      });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       playerRef.current = new Plyr(video, {
@@ -209,6 +257,12 @@ export default function VideoPlayer({
         };
         video.addEventListener("loadedmetadata", handleLoadedMetadata);
       }
+
+      video.addEventListener("error", reportFatalError);
+    } else {
+      // Trình duyệt không hỗ trợ MSE lẫn HLS gốc (vd. Firefox/Chrome đời
+      // cũ) — không có cách nào phát được link .m3u8 này.
+      reportFatalError();
     }
 
     // Lưu tiến trình xem: throttle timeupdate (tối đa mỗi 5s) để không
@@ -240,6 +294,7 @@ export default function VideoPlayer({
       if (handleLoadedMetadata) {
         video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       }
+      video.removeEventListener("error", reportFatalError);
       gestureLayerEl?.remove();
       playerRef.current?.destroy();
       playerRef.current = null;
@@ -305,13 +360,20 @@ export default function VideoPlayer({
   }, []);
 
   return (
-    <video
-      ref={videoRef}
-      className="video-player"
-      controls
-      autoPlay
-      playsInline
-      poster={poster}
-    />
+    <div className="video-player-wrap">
+      <video
+        ref={videoRef}
+        className="video-player"
+        controls
+        autoPlay
+        playsInline
+        poster={poster}
+      />
+      {playbackError && (
+        <div className="video-player__error">
+          <p>{playbackError}</p>
+        </div>
+      )}
+    </div>
   );
 }

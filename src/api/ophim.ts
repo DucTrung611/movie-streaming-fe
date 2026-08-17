@@ -1,4 +1,9 @@
 import { apiClient, API_BASE_URL } from "./client";
+import {
+  BLOCKED_CATEGORY_SLUGS,
+  filterBlockedMovies,
+  isBlockedMovie,
+} from "../utils/contentFilter";
 import type {
   DetailResponse,
   ListResponse,
@@ -32,7 +37,7 @@ type RawResponse = Record<string, any>;
 // Chuẩn hoá danh sách phim (nhiều dạng response khác nhau tuỳ endpoint)
 function normalizeListResponse(raw: RawResponse): ListResponse {
   const data = raw?.data ?? raw;
-  const items: Movie[] = data?.items ?? [];
+  const items: Movie[] = filterBlockedMovies(data?.items ?? []);
   const pagination =
     data?.params?.pagination ?? data?.pagination ?? raw?.pagination ?? {};
   const cdnImageDomain =
@@ -60,7 +65,9 @@ function normalizeDetailResponse(raw: RawResponse): DetailResponse {
   const episodes = raw?.episodes ?? raw?.data?.item?.episode ?? [];
   const cdnImageDomain =
     raw?.data?.APP_DOMAIN_CDN_IMAGE ?? raw?.APP_DOMAIN_CDN_IMAGE ?? "";
-  return { movie, episodes, cdnImageDomain };
+  // Chặn truy cập trực tiếp bằng URL vào phim thuộc thể loại bị cấm —
+  // trả về null để trang chi tiết/xem phim hiện "Không tìm thấy phim".
+  return { movie: isBlockedMovie(movie) ? null : movie, episodes, cdnImageDomain };
 }
 
 /** Phim mới cập nhật */
@@ -93,13 +100,10 @@ function normalizeSimpleListResponse(raw: RawResponse): NamedSlug[] {
   return data?.items ?? [];
 }
 
-// Ẩn khỏi mọi nơi lọc theo thể loại (trang duyệt thể loại, dropdown bộ lọc...).
-const HIDDEN_GENRE_SLUGS = ["phim-18"];
-
 export async function getGenres(): Promise<NamedSlug[]> {
   const raw: RawResponse = await apiClient.get("/v1/api/the-loai");
   const items = normalizeSimpleListResponse(raw);
-  return items.filter((g) => !HIDDEN_GENRE_SLUGS.includes(g.slug));
+  return items.filter((g) => !BLOCKED_CATEGORY_SLUGS.includes(g.slug));
 }
 
 export async function getMoviesByGenre(

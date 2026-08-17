@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
@@ -56,6 +56,14 @@ export default function Watch() {
       ? resumeEntry.currentTime
       : 0;
 
+  // Nếu phát HLS lỗi hẳn (link chết, bị chặn hotlink...), tự chuyển
+  // sang link nhúng (embed) của cùng server thay vì để màn hình đứng
+  // hình không rõ lý do. Reset lại mỗi khi đổi tập/server.
+  const [forceEmbed, setForceEmbed] = useState(false);
+  useEffect(() => {
+    setForceEmbed(false);
+  }, [episode?.slug, serverIndex]);
+
   const handleProgress = useCallback(
     (currentTime: number, duration: number) => {
       if (!movie || !episode) return;
@@ -99,12 +107,15 @@ export default function Watch() {
       </div>
 
       <div className="watch-page__player">
-        {episode.link_m3u8 ? (
+        {episode.link_m3u8 && !forceEmbed ? (
           <VideoPlayer
             src={episode.link_m3u8}
             poster={poster}
             resumeTime={resumeTime}
             onProgress={handleProgress}
+            onFatalError={() => {
+              if (episode.link_embed) setForceEmbed(true);
+            }}
           />
         ) : episode.link_embed ? (
           <iframe
