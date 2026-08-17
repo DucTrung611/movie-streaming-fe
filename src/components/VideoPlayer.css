@@ -29,8 +29,7 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--gold);
+  background: rgba(0, 0, 0, 0.25);
   border-radius: 999px;
   padding: 8px 18px;
   pointer-events: none;
@@ -43,14 +42,14 @@
     transform: scale(0.7);
   }
   20% {
-    opacity: 1;
+    opacity: 0.55;
     transform: scale(1.05);
   }
   30% {
     transform: scale(1);
   }
   75% {
-    opacity: 1;
+    opacity: 0.55;
   }
   100% {
     opacity: 0;
