@@ -1,21 +1,22 @@
 import "./Pagination.css";
 
+const BLOCK_SIZE = 10;
+
+/**
+ * Hiện đúng 1 khối 10 trang liên tiếp (kiểu Google) thay vì rải rác
+ * đầu/cuối + "...". blockStart luôn có dạng 10k+1 nên nút lùi khối
+ * luôn đáp xuống mốc chục tròn (10, 20, 30...).
+ */
 export default function Pagination({ currentPage, totalPages, onChange }) {
   if (!totalPages || totalPages <= 1) return null;
 
   const page = Number(currentPage) || 1;
   const total = Number(totalPages) || 1;
 
-  const pages = new Set([1, total, page, page - 1, page + 1]);
-  const sorted = [...pages].filter((p) => p >= 1 && p <= total).sort((a, b) => a - b);
-
-  const items = [];
-  let prev = 0;
-  for (const p of sorted) {
-    if (prev && p - prev > 1) items.push("ellipsis-" + p);
-    items.push(p);
-    prev = p;
-  }
+  const blockStart = Math.floor((page - 1) / BLOCK_SIZE) * BLOCK_SIZE + 1;
+  const blockEnd = Math.min(blockStart + BLOCK_SIZE - 1, total);
+  const blockPages = [];
+  for (let p = blockStart; p <= blockEnd; p++) blockPages.push(p);
 
   return (
     <nav className="pagination" aria-label="Phân trang">
@@ -28,24 +29,36 @@ export default function Pagination({ currentPage, totalPages, onChange }) {
       </button>
 
       <div className="pagination__pages">
-        {items.map((item) =>
-          typeof item === "number" ? (
-            <button
-              key={item}
-              className={
-                item === page
-                  ? "pagination__page is-active"
-                  : "pagination__page"
-              }
-              onClick={() => onChange(item)}
-            >
-              {item}
-            </button>
-          ) : (
-            <span key={item} className="pagination__ellipsis">
-              …
-            </span>
-          )
+        {blockStart > 1 && (
+          <button
+            className="pagination__block"
+            title="Lùi 10 trang"
+            onClick={() => onChange(blockStart - 1)}
+          >
+            «
+          </button>
+        )}
+
+        {blockPages.map((p) => (
+          <button
+            key={p}
+            className={
+              p === page ? "pagination__page is-active" : "pagination__page"
+            }
+            onClick={() => onChange(p)}
+          >
+            {p}
+          </button>
+        ))}
+
+        {blockEnd < total && (
+          <button
+            className="pagination__block"
+            title="Tiến 10 trang"
+            onClick={() => onChange(blockEnd + 1)}
+          >
+            »
+          </button>
         )}
       </div>
 

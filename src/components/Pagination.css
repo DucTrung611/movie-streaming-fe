@@ -52,7 +52,17 @@
   font-weight: 600;
 }
 
-.pagination__ellipsis {
+.pagination__block {
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--text-faint);
-  padding: 0 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+}
+
+.pagination__block:hover {
+  border-color: var(--border);
+  color: var(--gold);
 }
