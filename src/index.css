@@ -98,7 +98,11 @@ h3 {
 .container {
   max-width: var(--container);
   margin: 0 auto;
-  padding: 0 20px;
+  /* padding-inline (không phải "padding" shorthand) để không bị
+     .section (padding-block) ghi đè mất khi 1 phần tử dùng chung cả
+     2 class — trước đây "padding: 0 20px" bị "padding: 40px 0" của
+     .section đè hoàn toàn vì cùng thuộc tính shorthand. */
+  padding-inline: 20px;
 }
 
 /* ---------- Signature element: sprocket / film-strip rail ----------
@@ -120,7 +124,7 @@ h3 {
 }
 
 .section {
-  padding: 40px 0;
+  padding-block: 40px;
 }
 
 .section-head {

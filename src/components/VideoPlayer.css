@@ -14,3 +14,17 @@
   --plyr-control-radius: var(--radius);
   aspect-ratio: 16 / 9;
 }
+
+/* Thiết bị cảm ứng: nút điều khiển mặc định của Plyr chỉ ~32px, dưới
+   mức khuyến nghị cho vùng chạm ngón tay (~44px) — tăng padding/kích
+   thước icon và độ dày track/thumb của thanh tua để bấm/kéo dễ hơn.
+   Dùng (pointer: coarse) thay vì breakpoint theo màn hình để nhắm
+   đúng thiết bị cảm ứng thật (kể cả tablet lớn, laptop cảm ứng...). */
+@media (pointer: coarse) {
+  .plyr {
+    --plyr-control-spacing: 14px;
+    --plyr-control-icon-size: 20px;
+    --plyr-range-thumb-height: 18px;
+    --plyr-range-track-height: 6px;
+  }
+}

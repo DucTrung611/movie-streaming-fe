@@ -119,6 +119,17 @@
   }
   .site-nav {
     order: 3;
-    width: 100%;
+    /* flex: 1 (flex-basis: 0%) ở rule gốc sẽ đè "width: 100%" — phải
+       set lại flex-basis thì nav mới thật sự chiếm trọn dòng riêng. */
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header__row {
+    padding: 10px 14px;
+  }
+  .search-box input {
+    width: 120px;
   }
 }

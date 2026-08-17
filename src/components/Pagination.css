@@ -6,6 +6,12 @@
   margin-top: 32px;
   font-family: var(--font-mono);
   font-size: 13px;
+  /* 10 nút số trang cộng 2 nút Trước/Sau rộng hơn màn hình điện thoại
+     — nếu không giới hạn, .pagination__pages sẽ đẩy tràn cả trang
+     (viewport bị trình duyệt mobile tự phóng to ra để vừa nội dung).
+     max-width: 100% + flex item bên trong tự cuộn ngang sẽ giữ layout
+     đúng khổ màn hình. */
+  max-width: 100%;
 }
 
 .pagination__nav {
@@ -14,6 +20,7 @@
   color: var(--text-muted);
   padding: 8px 14px;
   border-radius: var(--radius);
+  flex-shrink: 0;
 }
 
 .pagination__nav:hover:not(:disabled) {
@@ -30,6 +37,18 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  /* min-width: 0 để flexbox cho phép co lại dưới độ rộng nội dung tự
+     nhiên — mặc định flex item có min-width: auto, khiến overflow-x
+     không có tác dụng và cả .pagination bị đẩy tràn thay vì cuộn
+     ngang gọn bên trong. */
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+
+.pagination__pages::-webkit-scrollbar {
+  display: none;
 }
 
 .pagination__page {
@@ -38,6 +57,7 @@
   color: var(--text-muted);
   width: 32px;
   height: 32px;
+  flex-shrink: 0;
   border-radius: var(--radius);
 }
 
@@ -58,6 +78,7 @@
   color: var(--text-faint);
   width: 32px;
   height: 32px;
+  flex-shrink: 0;
   border-radius: var(--radius);
   font-family: var(--font-mono);
 }
