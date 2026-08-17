@@ -6,6 +6,16 @@ import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import "./IndexTags.css";
 
+// Quốc gia có nhiều phim/được tìm nhiều nhất — ưu tiên hiện đầu danh sách.
+const PINNED_SLUGS = ["au-my", "han-quoc", "trung-quoc"];
+
+function sortPinnedFirst(items) {
+  const bySlug = new Map(items.map((c) => [c.slug, c]));
+  const pinned = PINNED_SLUGS.map((slug) => bySlug.get(slug)).filter(Boolean);
+  const rest = items.filter((c) => !PINNED_SLUGS.includes(c.slug));
+  return [...pinned, ...rest];
+}
+
 export default function CountryIndex() {
   useDocumentTitle("Quốc gia");
   const { data, loading, error } = useOphim(() => getCountries(), []);
@@ -22,7 +32,7 @@ export default function CountryIndex() {
       {error && <ErrorState message={error.message} />}
       {!loading && !error && (
         <div className="tag-grid">
-          {(data || []).map((c) => (
+          {sortPinnedFirst(data || []).map((c) => (
             <Link key={c.slug} to={`/quoc-gia/${c.slug}`} className="tag-chip">
               {c.name}
             </Link>
