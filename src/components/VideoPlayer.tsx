@@ -189,7 +189,13 @@ export default function VideoPlayer({
         );
 
         playerRef.current = new Plyr(video, {
-          controls: isTouch ? TOUCH_CONTROLS : undefined,
+          // Plyr merge options bằng cách duyệt qua mọi key có mặt trong
+          // object truyền vào — kể cả khi giá trị là undefined — nên
+          // key "controls" chỉ được thêm vào object khi thật sự cần ghi
+          // đè (thiết bị cảm ứng). Nếu luôn truyền "controls: undefined"
+          // trên desktop, nó sẽ GHI ĐÈ mất bộ điều khiển mặc định đầy
+          // đủ của Plyr bằng rỗng, làm mất hẳn thanh điều khiển video.
+          ...(isTouch ? { controls: TOUCH_CONTROLS } : {}),
           quality: {
             default: 0,
             options: [0, ...heights],
@@ -244,7 +250,7 @@ export default function VideoPlayer({
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       playerRef.current = new Plyr(video, {
-        controls: isTouch ? TOUCH_CONTROLS : undefined,
+        ...(isTouch ? { controls: TOUCH_CONTROLS } : {}),
       });
       gestureLayerEl = mountGestureLayer(video, { onTap: handleGestureTap });
 
