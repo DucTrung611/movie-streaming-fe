@@ -29,8 +29,8 @@
 }
 
 .server-tab {
-  font-family: var(--font-mono);
   font-size: 12.5px;
+  font-weight: 600;
   padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -38,24 +38,23 @@
 }
 
 .server-tab:hover {
-  border-color: var(--gold-dim);
+  border-color: var(--text);
   color: var(--text);
 }
 
 .server-tab.is-active {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #14100a;
-  font-weight: 600;
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--text);
 }
 
 .watch-page__episodes {
   padding-top: 8px;
-  border-top: 1px dashed var(--border);
+  border-top: 1px solid var(--border);
 }
 
 .episode-chip.is-active {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #14100a;
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--text);
 }

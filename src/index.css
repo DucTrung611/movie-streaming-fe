@@ -1,33 +1,52 @@
 /* ============================================================
-   DESIGN TOKENS — "Rạp Chiếu"
-   Bảng màu lấy cảm hứng từ rạp chiếu bóng cũ: nền xanh đen như
-   phòng chiếu tối, điểm nhấn vàng đèn marquee, đỏ gạch của hộp
-   phim nhựa. Chữ display dùng Oswald (condensed, chất bảng hiệu
-   rạp phim), chữ nội dung Be Vietnam Pro (hỗ trợ tiếng Việt tốt),
-   chữ mono cho các nhãn dữ liệu (năm, tập, thời lượng).
+   DESIGN TOKENS — Netflix-inspired dark theme
+   Nền đen tuyệt đối, đỏ Netflix làm điểm nhấn duy nhất, chữ Bebas
+   Neue cho tiêu đề lớn (đậm, condensed), Inter cho nội dung (hỗ
+   trợ tiếng Việt tốt). Bố cục ưu tiên poster lớn, hàng cuộn ngang,
+   hiệu ứng phóng to khi hover — không viền trang trí, không hoạ
+   tiết thừa.
    ============================================================ */
 :root {
-  --bg: #0b0f14;
-  --bg-elevated: #10161f;
-  --bg-card: #141b25;
-  --bg-card-hover: #1a2330;
-  --sprocket: #1f2a38;
-  --border: #212b38;
+  --bg: #141414;
+  --bg-elevated: #000000;
+  --bg-card: #1f1f1f;
+  --bg-card-hover: #2a2a2a;
+  --border: #2c2c2c;
 
-  --gold: #e8b23d;
-  --gold-dim: #b8872b;
-  --brick: #c1443b;
+  --red: #e50914;
+  --red-dim: #b1060f;
 
-  --text: #f2efe9;
-  --text-muted: #8b93a1;
-  --text-faint: #5a6472;
+  --text: #ffffff;
+  --text-muted: #b3b3b3;
+  --text-faint: #737373;
 
-  --font-display: "Oswald", "Arial Narrow", sans-serif;
-  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Inter", "Helvetica Neue", Arial, sans-serif;
 
-  --radius: 6px;
-  --container: 1240px;
+  --radius: 4px;
+  --container: 1400px;
+  --header-h: 68px;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --header-h: 132px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-h: 124px;
+  }
+}
+
+.app-main {
+  padding-top: var(--header-h);
+}
+
+.app-main--flush {
+  padding-top: 0;
 }
 
 * {
@@ -71,18 +90,17 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   margin: 0;
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--bg);
+  background: var(--red);
+  color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--red);
   outline-offset: 2px;
 }
 
@@ -102,29 +120,11 @@ h3 {
      .section (padding-block) ghi đè mất khi 1 phần tử dùng chung cả
      2 class — trước đây "padding: 0 20px" bị "padding: 40px 0" của
      .section đè hoàn toàn vì cùng thuộc tính shorthand. */
-  padding-inline: 20px;
-}
-
-/* ---------- Signature element: sprocket / film-strip rail ----------
-   Dải lỗ sprocket lặp lại như mép cuộn phim 35mm — dùng làm divider
-   giữa các section và viền quanh khu vực xem phim, thay vì một
-   đường kẻ trơn thông thường. */
-.film-rail {
-  height: 14px;
-  background-image: radial-gradient(
-    circle,
-    var(--sprocket) 3.5px,
-    transparent 3.6px
-  );
-  background-size: 22px 14px;
-  background-position: 11px center;
-  background-color: var(--bg-elevated);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding-inline: 4%;
 }
 
 .section {
-  padding-block: 40px;
+  padding-block: 26px;
 }
 
 .section-head {
@@ -132,49 +132,49 @@ h3 {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .section-head h2 {
-  font-size: 26px;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  text-transform: none;
   color: var(--text);
 }
 
 .section-head .eyebrow {
-  font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.12em;
-  color: var(--gold);
+  letter-spacing: 0.08em;
+  color: var(--red);
+  font-weight: 700;
   text-transform: uppercase;
   display: block;
   margin-bottom: 4px;
 }
 
 .see-all {
-  font-family: var(--font-mono);
   font-size: 13px;
+  font-weight: 600;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--text-faint);
-  padding-bottom: 2px;
-  white-space: nowrap;
 }
 
 .see-all:hover {
-  color: var(--gold);
-  border-color: var(--gold);
+  color: var(--text);
+  text-decoration: underline;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.04em;
-  padding: 2px 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 8px;
   border-radius: 3px;
-  background: rgba(232, 178, 61, 0.12);
-  color: var(--gold);
-  border: 1px solid rgba(232, 178, 61, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .btn {
@@ -182,44 +182,40 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 15px;
-  padding: 12px 22px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 11px 24px;
   border-radius: var(--radius);
   border: 1px solid transparent;
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
 }
 
 .btn-primary {
-  background: var(--gold);
-  color: #14100a;
+  background: var(--text);
+  color: #000;
 }
 
 .btn-primary:hover {
-  background: #f2c25a;
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .btn-outline {
-  border-color: var(--border);
+  border-color: transparent;
   color: var(--text);
-  background: transparent;
+  background: rgba(109, 109, 110, 0.7);
 }
 
 .btn-outline:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  background: rgba(109, 109, 110, 0.4);
 }
 
 .state-message {
-  font-family: var(--font-mono);
   color: var(--text-muted);
   padding: 60px 0;
   text-align: center;
 }
 
 .state-message.error {
-  color: var(--brick);
+  color: var(--red);
 }

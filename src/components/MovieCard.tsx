@@ -54,14 +54,13 @@ export default function MovieCard({ movie, cdnImageDomain }: MovieCardProps) {
             />
           </div>
         )}
-      </div>
-      <div className="movie-card__tear" aria-hidden="true" />
-      <div className="movie-card__info">
-        <h3 className="movie-card__title">{movie.name}</h3>
-        {movie.origin_name && (
-          <p className="movie-card__original">{movie.origin_name}</p>
-        )}
-        {movie.year && <p className="movie-card__year">{movie.year}</p>}
+        <div className="movie-card__overlay">
+          <h3 className="movie-card__title">{movie.name}</h3>
+          {movie.origin_name && (
+            <p className="movie-card__original">{movie.origin_name}</p>
+          )}
+          {movie.year && <p className="movie-card__year">{movie.year}</p>}
+        </div>
       </div>
     </Link>
   );

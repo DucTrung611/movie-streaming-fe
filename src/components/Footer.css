@@ -1,21 +1,22 @@
 .site-footer {
   margin-top: auto;
   background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
 }
 
 .site-footer__row {
-  padding: 24px 20px;
+  padding: 28px 4%;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
 }
 
 .site-footer .brand__accent {
-  color: var(--gold);
+  color: var(--text);
+  font-weight: 700;
 }
 
 .site-footer__muted {

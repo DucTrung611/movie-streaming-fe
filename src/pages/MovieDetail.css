@@ -2,6 +2,9 @@
   position: relative;
   background: var(--bg-elevated);
   overflow: hidden;
+  min-height: 72vh;
+  display: flex;
+  align-items: flex-end;
 }
 
 .movie-hero::before {
@@ -11,8 +14,7 @@
   background-image: var(--backdrop);
   background-size: cover;
   background-position: center 20%;
-  filter: blur(28px) brightness(0.35);
-  transform: scale(1.15);
+  filter: brightness(0.55);
 }
 
 .movie-hero__scrim {
@@ -20,8 +22,9 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(11, 15, 20, 0.4) 0%,
-    var(--bg-elevated) 92%
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(20, 20, 20, 0.55) 55%,
+    var(--bg) 96%
   );
 }
 
@@ -29,20 +32,25 @@
   position: relative;
   display: flex;
   gap: 32px;
-  padding: 40px 20px;
-  align-items: flex-start;
+  padding: var(--header-h) 4% 56px;
+  align-items: flex-end;
+  width: 100%;
 }
 
 .movie-hero__poster {
   width: 220px;
   flex-shrink: 0;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .movie-hero__info h1 {
-  font-size: 32px;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  font-family: var(--font-body);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
   margin: 6px 0 4px;
 }
 
@@ -67,7 +75,7 @@
 
 .movie-hero__meta strong {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .movie-hero__content {
@@ -86,14 +94,17 @@
 }
 
 .favorite-toggle.is-active {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: rgba(232, 178, 61, 0.12);
+  background: rgba(229, 9, 20, 0.5);
+  color: var(--text);
 }
 
 @media (max-width: 680px) {
+  .movie-hero {
+    min-height: 68vh;
+  }
   .movie-hero__row {
     flex-direction: column;
+    align-items: flex-start;
   }
   .movie-hero__poster {
     width: 150px;
@@ -109,7 +120,9 @@
 
 .episode-server__name {
   font-size: 15px;
-  color: var(--gold);
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--text);
   margin-bottom: 10px;
 }
 
@@ -120,16 +133,18 @@
 }
 
 .episode-chip {
-  font-family: var(--font-mono);
   font-size: 12.5px;
-  padding: 8px 12px;
+  font-weight: 600;
+  padding: 8px 14px;
   border-radius: 4px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-muted);
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
 
 .episode-chip:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--text);
+  color: var(--text);
+  background: var(--bg-card-hover);
 }

@@ -1,5 +1,5 @@
 import { useContinueWatching } from "../hooks/useContinueWatching";
-import MovieGrid from "./MovieGrid";
+import MovieRow from "./MovieRow";
 
 export default function ContinueWatchingSection() {
   const { items } = useContinueWatching();
@@ -15,7 +15,7 @@ export default function ContinueWatchingSection() {
           <h2>Tiếp tục xem</h2>
         </div>
       </div>
-      <MovieGrid movies={items} cdnImageDomain="" />
+      <MovieRow movies={items} cdnImageDomain="" />
     </section>
   );
 }

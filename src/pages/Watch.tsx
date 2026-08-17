@@ -99,7 +99,6 @@ export default function Watch() {
       </div>
 
       <div className="watch-page__player">
-        <div className="film-rail" aria-hidden="true" />
         {episode.link_m3u8 ? (
           <VideoPlayer
             src={episode.link_m3u8}
@@ -120,7 +119,6 @@ export default function Watch() {
             Tập này chưa có link phát. Thử server khác bên dưới.
           </p>
         )}
-        <div className="film-rail" aria-hidden="true" />
       </div>
 
       <div className="watch-page__servers">

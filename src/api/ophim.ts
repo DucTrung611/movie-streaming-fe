@@ -155,6 +155,7 @@ export async function getMovieDetail(slug: string): Promise<DetailResponse> {
 export const MOVIE_TYPES: MovieType[] = [
   { slug: "phim-bo", label: "Phim bộ" },
   { slug: "phim-le", label: "Phim lẻ" },
+  { slug: "phim-chieu-rap", label: "Phim chiếu rạp" },
   { slug: "hoat-hinh", label: "Hoạt hình" },
   { slug: "tv-shows", label: "TV Shows" },
   { slug: "phim-vietsub", label: "Vietsub" },

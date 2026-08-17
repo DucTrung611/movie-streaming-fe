@@ -4,8 +4,8 @@
   justify-content: center;
   gap: 14px;
   margin-top: 32px;
-  font-family: var(--font-mono);
   font-size: 13px;
+  font-weight: 600;
   /* 10 nút số trang cộng 2 nút Trước/Sau rộng hơn màn hình điện thoại
      — nếu không giới hạn, .pagination__pages sẽ đẩy tràn cả trang
      (viewport bị trình duyệt mobile tự phóng to ra để vừa nội dung).
@@ -24,8 +24,8 @@
 }
 
 .pagination__nav:hover:not(:disabled) {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .pagination__nav:disabled {
@@ -67,9 +67,9 @@
 }
 
 .pagination__page.is-active {
-  background: var(--gold);
-  color: #14100a;
-  font-weight: 600;
+  background: var(--red);
+  color: var(--text);
+  font-weight: 700;
 }
 
 .pagination__block {
@@ -80,10 +80,9 @@
   height: 32px;
   flex-shrink: 0;
   border-radius: var(--radius);
-  font-family: var(--font-mono);
 }
 
 .pagination__block:hover {
   border-color: var(--border);
-  color: var(--gold);
+  color: var(--text);
 }

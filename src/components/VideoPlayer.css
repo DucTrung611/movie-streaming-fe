@@ -25,7 +25,6 @@
 }
 
 .video-gesture-layer__feedback {
-  font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
@@ -61,7 +60,7 @@
 }
 
 .plyr {
-  --plyr-color-main: var(--gold);
+  --plyr-color-main: var(--red);
   --plyr-video-background: #000;
   --plyr-menu-background: var(--bg-elevated);
   --plyr-menu-color: var(--text);

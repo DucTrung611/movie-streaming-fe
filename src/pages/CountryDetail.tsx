@@ -2,11 +2,16 @@ import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getMoviesByCountry } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
+import { sortMoviesByYear } from "../utils/sortMovies";
 
 export default function CountryDetail() {
   const { slug = "" } = useParams<{ slug: string }>();
   const fetcher = useCallback(
-    (page: number) => getMoviesByCountry(slug, { page, limit: 24 }),
+    (page: number) =>
+      getMoviesByCountry(slug, { page, limit: 24 }).then((res) => ({
+        ...res,
+        items: sortMoviesByYear(res.items),
+      })),
     [slug]
   );
 

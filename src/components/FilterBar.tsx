@@ -9,6 +9,8 @@ interface FilterBarProps {
   countries?: NamedSlug[];
   value: ListFilters;
   onChange: (value: ListFilters) => void;
+  sort?: "desc" | "asc";
+  onSortChange?: (sort: "desc" | "asc") => void;
 }
 
 export default function FilterBar({
@@ -16,6 +18,8 @@ export default function FilterBar({
   countries = [],
   value,
   onChange,
+  sort = "desc",
+  onSortChange,
 }: FilterBarProps) {
   function set(field: keyof ListFilters, val: string) {
     onChange({ ...value, [field]: val });
@@ -23,6 +27,16 @@ export default function FilterBar({
 
   return (
     <div className="filter-bar">
+      {onSortChange && (
+        <select
+          value={sort}
+          onChange={(e) => onSortChange(e.target.value as "desc" | "asc")}
+        >
+          <option value="desc">Năm phát hành: Mới nhất</option>
+          <option value="asc">Năm phát hành: Cũ nhất</option>
+        </select>
+      )}
+
       <select
         value={value.category || ""}
         onChange={(e) => set("category", e.target.value)}

@@ -5,16 +5,18 @@
 }
 
 .tag-chip {
-  font-family: var(--font-mono);
   font-size: 13px;
+  font-weight: 600;
   padding: 9px 16px;
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-muted);
   background: var(--bg-card);
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
 
 .tag-chip:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--text);
+  color: var(--text);
+  background: var(--bg-card-hover);
 }

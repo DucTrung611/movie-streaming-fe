@@ -3,7 +3,8 @@ import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { getLatestMovies, getMoviesByType } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
-import MovieGrid from "../components/MovieGrid";
+import { sortMoviesByYear } from "../utils/sortMovies";
+import MovieRow from "../components/MovieRow";
 import ContinueWatchingSection from "../components/ContinueWatchingSection";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
@@ -22,17 +23,20 @@ export default function Home() {
 
   return (
     <div>
-      <ReelHero data={data} loading={loading} error={error} />
-      <ContinueWatchingSection />
+      <FeaturedHero data={data} loading={loading} error={error} />
 
-      {SECTIONS.map((s) => (
-        <TypeSection key={s.type} {...s} />
-      ))}
+      <div className="home-rows">
+        <ContinueWatchingSection />
+
+        {SECTIONS.map((s) => (
+          <TypeSection key={s.type} {...s} />
+        ))}
+      </div>
     </div>
   );
 }
 
-function ReelHero({
+function FeaturedHero({
   data,
   loading,
   error,
@@ -41,46 +45,66 @@ function ReelHero({
   loading: boolean;
   error: Error | null;
 }) {
-  const items = data?.items?.slice(0, 10) || [];
+  const featured = data?.items?.[0];
+  const backdrop = featured
+    ? resolveImageUrl(
+        featured.thumb_url || featured.poster_url,
+        data?.cdnImageDomain
+      )
+    : "";
+  const firstEpisodeHint = featured?.episode_current;
+
+  if (loading) {
+    return (
+      <section className="hero hero--empty">
+        <Loader />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="hero hero--empty">
+        <ErrorState message={error.message} />
+      </section>
+    );
+  }
+
+  if (!featured) return null;
 
   return (
-    <section className="reel-hero">
-      <div className="film-rail" aria-hidden="true" />
-      <div className="container reel-hero__head">
-        <span className="eyebrow">Suất chiếu hôm nay</span>
-        <h1>Mới cập nhật</h1>
-      </div>
-
-      {loading && <Loader />}
-      {error && <ErrorState message={error.message} />}
-
-      {!loading && !error && (
-        <div className="reel-strip">
-          {items.map((movie) => (
-            <Link
-              key={movie._id || movie.slug}
-              to={`/phim/${movie.slug}`}
-              className="reel-frame"
-            >
-              <img
-                src={resolveImageUrl(
-                  movie.poster_url || movie.thumb_url,
-                  data?.cdnImageDomain
-                )}
-                alt={movie.name}
-                loading="lazy"
-              />
-              <div className="reel-frame__caption">
-                <p className="reel-frame__title">{movie.name}</p>
-                <p className="reel-frame__meta">
-                  {movie.episode_current || movie.year}
-                </p>
-              </div>
-            </Link>
-          ))}
+    <section
+      className="hero"
+      style={{ backgroundImage: `url(${backdrop})` }}
+    >
+      <div className="hero__scrim" />
+      <div className="hero__scrim hero__scrim--side" />
+      <div className="container hero__content">
+        <span className="hero__eyebrow">Mới cập nhật</span>
+        <h1 className="hero__title">{featured.name}</h1>
+        {featured.origin_name && (
+          <p className="hero__original">{featured.origin_name}</p>
+        )}
+        <div className="hero__badges">
+          {featured.quality && <span className="badge">{featured.quality}</span>}
+          {firstEpisodeHint && <span className="badge">{firstEpisodeHint}</span>}
+          {featured.year && <span className="badge">{featured.year}</span>}
         </div>
-      )}
-      <div className="film-rail" aria-hidden="true" />
+        {featured.content && (
+          <p
+            className="hero__desc"
+            dangerouslySetInnerHTML={{ __html: featured.content }}
+          />
+        )}
+        <div className="hero__actions">
+          <Link to={`/phim/${featured.slug}`} className="btn btn-primary">
+            ▶ Xem ngay
+          </Link>
+          <Link to={`/phim/${featured.slug}`} className="btn btn-outline">
+            ⓘ Chi tiết
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }
@@ -114,8 +138,8 @@ function TypeSection({
       {loading && <Loader />}
       {error && <ErrorState message={error.message} />}
       {!loading && !error && (
-        <MovieGrid
-          movies={data!.items.slice(0, 12)}
+        <MovieRow
+          movies={sortMoviesByYear(data!.items).slice(0, 12)}
           cdnImageDomain={data!.cdnImageDomain}
         />
       )}

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -15,10 +15,16 @@ import Watch from "./pages/Watch";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
+  const { pathname } = useLocation();
+  // Trang chủ và trang chi tiết phim có hero full-bleed nằm ngay dưới
+  // header trong suốt nên không cần padding-top; các trang còn lại cần
+  // chừa chỗ cho header fixed để nội dung không bị che mất.
+  const isFlush = pathname === "/" || pathname.startsWith("/phim/");
+
   return (
     <>
       <Header />
-      <main style={{ flex: 1 }}>
+      <main className={`app-main${isFlush ? " app-main--flush" : ""}`}>
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />

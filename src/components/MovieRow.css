@@ -1,0 +1,23 @@
+.movie-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  /* padding-block để card có chỗ phóng to khi hover mà không bị cắt
+     bởi overflow-x: auto của chính hàng cuộn. */
+  padding-block: 40px;
+  margin-block: -40px;
+}
+
+.movie-row__item {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 720px) {
+  .movie-row__item {
+    width: 140px;
+  }
+}

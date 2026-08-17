@@ -1,26 +1,30 @@
 .movie-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-card);
+  display: block;
+  position: relative;
   border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.25s ease, z-index 0.25s ease;
 }
 
 .movie-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--gold-dim);
+  transform: scale(1.12);
+  z-index: 5;
 }
 
-.movie-card:hover .movie-card__title {
-  color: var(--gold);
+.movie-card:hover .movie-card__poster {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7);
+}
+
+.movie-card:hover .movie-card__overlay {
+  opacity: 1;
 }
 
 .movie-card__poster {
   position: relative;
   aspect-ratio: 2 / 3;
-  background: var(--sprocket);
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
 }
 
 .movie-card__poster img {
@@ -33,13 +37,12 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(11, 15, 20, 0.85);
-  color: var(--gold);
-  font-family: var(--font-mono);
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--text);
   font-size: 10.5px;
+  font-weight: 700;
   padding: 3px 6px;
   border-radius: 3px;
-  border: 1px solid rgba(232, 178, 61, 0.4);
 }
 
 .movie-card__progress {
@@ -48,58 +51,59 @@
   right: 0;
   bottom: 0;
   height: 4px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .movie-card__progress-fill {
   height: 100%;
-  background: var(--gold);
+  background: var(--red);
 }
 
-/* mép "xé vé" giữa poster và phần thông tin, gợi liên tưởng vé xem phim */
-.movie-card__tear {
-  height: 6px;
-  background-image: linear-gradient(
-      -45deg,
-      var(--bg-card) 50%,
-      transparent 50%
-    ),
-    linear-gradient(45deg, var(--bg-card) 50%, transparent 50%);
-  background-size: 8px 6px;
-  background-repeat: repeat-x;
-  background-color: transparent;
-}
-
-.movie-card__info {
-  padding: 10px 12px 14px;
+.movie-card__overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 26px 10px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .movie-card__title {
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--text);
   line-height: 1.35;
-  margin: 0 0 3px;
+  margin: 0 0 2px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  transition: color 0.12s ease;
 }
 
 .movie-card__original {
-  font-size: 11.5px;
-  color: var(--text-faint);
-  margin: 0 0 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0 0 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .movie-card__year {
-  font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--text-faint);
   margin: 0;
+}
+
+@media (hover: none) {
+  .movie-card:hover {
+    transform: none;
+  }
+
+  .movie-card__overlay {
+    opacity: 1;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 70%);
+  }
 }

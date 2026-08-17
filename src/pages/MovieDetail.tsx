@@ -21,7 +21,8 @@ export default function MovieDetail() {
   if (!data?.movie) return <ErrorState message="Không tìm thấy phim." />;
 
   const { movie, episodes, cdnImageDomain } = data;
-  const poster = resolveImageUrl(movie.thumb_url || movie.poster_url, cdnImageDomain);
+  const poster = resolveImageUrl(movie.poster_url || movie.thumb_url, cdnImageDomain);
+  const backdrop = resolveImageUrl(movie.thumb_url || movie.poster_url, cdnImageDomain);
   const firstEpisode = episodes?.[0]?.server_data?.[0];
   const favorited = isFavorite(movie.slug);
 
@@ -41,7 +42,7 @@ export default function MovieDetail() {
     <div>
       <div
         className="movie-hero"
-        style={{ "--backdrop": `url(${poster})` } as CSSProperties}
+        style={{ "--backdrop": `url(${backdrop})` } as CSSProperties}
       >
         <div className="movie-hero__scrim" />
         <div className="container movie-hero__row">
@@ -119,8 +120,6 @@ export default function MovieDetail() {
           </div>
         </div>
       </div>
-
-      <div className="film-rail" aria-hidden="true" />
 
       <div className="section container">
         <div className="section-head">
