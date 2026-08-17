@@ -5,6 +5,62 @@
   display: block;
 }
 
+/* Lớp trong suốt bắt cử chỉ chạm đúp tua ±10s — được VideoPlayer.jsx
+   chèn bằng JS vào bên trong .plyr__video-wrapper (cùng cấp với
+   .plyr__controls trong stacking context của .plyr) để z-index so
+   sánh đúng ngữ cảnh, không che mất thanh điều khiển thật bên dưới. */
+.video-gesture-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 1;
+}
+
+.video-gesture-layer__zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.video-gesture-layer__feedback {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 8px 18px;
+  pointer-events: none;
+  animation: video-gesture-feedback 0.65s ease-out forwards;
+}
+
+@keyframes video-gesture-feedback {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  30% {
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.plyr__controls {
+  z-index: 3;
+}
+
 .plyr {
   --plyr-color-main: var(--gold);
   --plyr-video-background: #000;
