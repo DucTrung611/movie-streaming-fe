@@ -202,6 +202,11 @@ export default function VideoPlayer({
           // xoay ngang theo nội dung video khi xoay máy; kiểu "giả toàn
           // màn hình" bằng CSS không có khả năng này trên Safari/iOS.
           fullscreen: { iosNative: true },
+          // global: true để mũi tên trái/phải tua ±10s (mặc định của
+          // Plyr) hoạt động bất cứ lúc nào đang ở trang xem phim, không
+          // cần bấm chuột vào player trước — Plyr tự bỏ qua khi đang gõ
+          // trong input/textarea nên không xung đột với các control khác.
+          keyboard: { focused: true, global: true },
           quality: {
             default: 0,
             options: [0, ...heights],
@@ -261,6 +266,7 @@ export default function VideoPlayer({
         // MSE) — bật toàn màn hình gốc để có thể tự xoay ngang khi xoay
         // máy, xem giải thích ở nhánh Hls.isSupported() phía trên.
         fullscreen: { iosNative: true },
+        keyboard: { focused: true, global: true },
       });
       gestureLayerEl = mountGestureLayer(video, { onTap: handleGestureTap });
 

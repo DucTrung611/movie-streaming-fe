@@ -14,11 +14,17 @@ declare module "plyr" {
     iosNative?: boolean;
   }
 
+  interface PlyrKeyboardOptions {
+    focused?: boolean;
+    global?: boolean;
+  }
+
   interface PlyrOptions {
     controls?: string[];
     quality?: PlyrQualityOptions;
     i18n?: Record<string, unknown>;
     fullscreen?: PlyrFullscreenOptions;
+    keyboard?: PlyrKeyboardOptions;
   }
 
   interface PlyrFullscreen {
