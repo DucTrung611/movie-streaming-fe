@@ -25,6 +25,11 @@ export default function SearchBox({ className = "" }: { className?: string }) {
   useEffect(() => {
     const trimmed = keyword.trim();
     if (trimmed.length < MIN_KEYWORD_LENGTH) {
+      // Tăng requestId ở đây để bỏ luôn kết quả trễ của 1 request cũ
+      // (từ từ khoá dài hơn) đang bay về — dropdown đang ẩn theo điều
+      // kiện độ dài keyword nên hiện tại vô hại, nhưng phòng hờ nếu
+      // logic hiển thị đổi sau này thì vẫn không set nhầm state cũ.
+      ++requestId.current;
       setSuggestions([]);
       setIsLoading(false);
       return;

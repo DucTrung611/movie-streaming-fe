@@ -46,6 +46,12 @@ export default function FilterBar({
     onChange({ ...value, [field]: val || undefined });
   }
 
+  // Thứ tự phần tử trong value.categories chính là thứ tự người dùng bấm
+  // chọn (không sắp xếp lại) — nơi gọi FilterBar (vd. ListByType.tsx)
+  // dùng categories[0] làm thể loại "chính" gửi lên server (server chỉ
+  // nhận 1 slug/lần), các thể loại còn lại chỉ lọc thêm ở client. Vì vậy
+  // bỏ chọn thể loại đã chọn đầu tiên sẽ đổi luôn thể loại chính và kích
+  // hoạt fetch lại — đây là hành vi có chủ đích, không phải bug.
   function toggleCategory(slug: string) {
     const next = selectedCategories.includes(slug)
       ? selectedCategories.filter((s) => s !== slug)

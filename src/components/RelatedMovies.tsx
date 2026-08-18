@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useOphim } from "../hooks/useOphim";
 import { getMoviesByGenre, getMoviesByCountry } from "../api/ophim";
 import MovieRow from "./MovieRow";
+import Loader from "./Loader";
 import type { Movie } from "../types/movie";
 
 interface RelatedMoviesProps {
@@ -19,6 +20,10 @@ export default function RelatedMovies({ movie }: RelatedMoviesProps) {
   const genreSlug = movie.category?.[0]?.slug;
   const countrySlug = movie.country?.[0]?.slug;
 
+  // Bỏ qua error của useOphim có chủ đích: đây là mục "gợi ý thêm" phụ,
+  // không phải nội dung chính của trang — lỗi mạng khiến section tự ẩn
+  // (related.length === 0 → return null) thay vì hiện thông báo lỗi to,
+  // đỡ làm phiền người dùng đang xem trang chi tiết phim.
   const { data, loading } = useOphim(() => {
     if (genreSlug) return getMoviesByGenre(genreSlug, { limit: 16 });
     if (countrySlug) return getMoviesByCountry(countrySlug, { limit: 16 });
@@ -55,7 +60,7 @@ export default function RelatedMovies({ movie }: RelatedMoviesProps) {
         <h2>Phim cùng thể loại</h2>
       </div>
       {loading ? (
-        <p className="state-message">Đang tải...</p>
+        <Loader />
       ) : (
         <MovieRow movies={related} cdnImageDomain={data?.cdnImageDomain || ""} />
       )}
