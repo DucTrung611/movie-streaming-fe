@@ -21,6 +21,10 @@ export default function CountryDetail() {
       title={slug.replace(/-/g, " ")}
       fetcher={fetcher}
       deps={[slug]}
+      breadcrumb={[
+        { label: "Quốc gia", to: "/quoc-gia" },
+        { label: slug.replace(/-/g, " ") },
+      ]}
     />
   );
 }

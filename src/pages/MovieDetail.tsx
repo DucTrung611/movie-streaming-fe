@@ -6,9 +6,11 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useFavorites } from "../hooks/useFavorites";
 import { getMovieDetail } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
+import { showToast } from "../utils/toast";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
 import RelatedMovies from "../components/RelatedMovies";
+import Breadcrumb from "../components/Breadcrumb";
 import "./MovieDetail.css";
 
 export default function MovieDetail() {
@@ -17,7 +19,7 @@ export default function MovieDetail() {
   useDocumentTitle(data?.movie?.name);
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader variant="hero" />;
   if (error) return <ErrorState message={error.message} />;
   if (!data?.movie) return <ErrorState message="Không tìm thấy phim." />;
 
@@ -28,6 +30,7 @@ export default function MovieDetail() {
   const favorited = isFavorite(movie.slug);
 
   function handleToggleFavorite() {
+    const wasFavorited = favorited;
     toggleFavorite({
       _id: movie._id,
       slug: movie.slug,
@@ -37,6 +40,10 @@ export default function MovieDetail() {
       poster_url: poster,
       episode_current: movie.episode_current,
     });
+    showToast(
+      wasFavorited ? "Đã bỏ khỏi danh sách yêu thích" : "Đã thêm vào danh sách yêu thích",
+      "success"
+    );
   }
 
   return (
@@ -50,6 +57,12 @@ export default function MovieDetail() {
           <img className="movie-hero__poster" src={poster} alt={movie.name} />
 
           <div className="movie-hero__info">
+            <Breadcrumb
+              items={[
+                { label: movie.type === "series" ? "Phim bộ" : "Phim lẻ" },
+                { label: movie.name },
+              ]}
+            />
             <span className="eyebrow">
               {movie.type === "series" ? "Phim bộ" : "Phim lẻ"} ·{" "}
               {movie.year}

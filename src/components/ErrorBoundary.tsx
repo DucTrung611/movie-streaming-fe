@@ -1,7 +1,11 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, Fragment, type ErrorInfo, type ReactNode } from "react";
 
 interface ErrorBoundaryState {
   error: Error | null;
+  // Tăng lên mỗi lần "Thử lại" — dùng làm key để ép React tạo mới hẳn
+  // cây con thay vì tái sử dụng, nhờ vậy các hook bên trong (fetch dữ
+  // liệu, state...) cũng chạy lại từ đầu chứ không lặp lại đúng lỗi cũ.
+  resetCount: number;
 }
 
 /**
@@ -14,9 +18,9 @@ export default class ErrorBoundary extends Component<
   { children: ReactNode },
   ErrorBoundaryState
 > {
-  state: ErrorBoundaryState = { error: null };
+  state: ErrorBoundaryState = { error: null, resetCount: 0 };
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { error };
   }
 
@@ -24,8 +28,11 @@ export default class ErrorBoundary extends Component<
     console.error("Lỗi không bắt được:", error, info.componentStack);
   }
 
-  handleReload = () => {
-    this.setState({ error: null });
+  handleRetry = () => {
+    this.setState((s) => ({ error: null, resetCount: s.resetCount + 1 }));
+  };
+
+  handleGoHome = () => {
     window.location.href = "/";
   };
 
@@ -41,19 +48,28 @@ export default class ErrorBoundary extends Component<
             Suất chiếu gặp trục trặc
           </h1>
           <p className="state-message" style={{ padding: 0, marginBottom: 24 }}>
-            Có lỗi ngoài dự kiến xảy ra. Thử quay lại trang chủ nhé.
+            Có lỗi ngoài dự kiến xảy ra. Thử lại hoặc quay về trang chủ.
           </p>
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={this.handleReload}
-          >
-            ‹ Về trang chủ
-          </button>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={this.handleRetry}
+            >
+              ↻ Thử lại
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={this.handleGoHome}
+            >
+              ‹ Về trang chủ
+            </button>
+          </div>
         </div>
       );
     }
 
-    return this.props.children;
+    return <Fragment key={this.state.resetCount}>{this.props.children}</Fragment>;
   }
 }

@@ -4,6 +4,9 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loader from "./components/Loader";
+import ToastContainer from "./components/ToastContainer";
+import BackToTop from "./components/BackToTop";
+import useScrollRestoration from "./hooks/useScrollRestoration";
 import Home from "./pages/Home";
 
 const ListByType = lazy(() => import("./pages/ListByType"));
@@ -19,6 +22,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 export default function App() {
   const { pathname } = useLocation();
+  useScrollRestoration();
   // Trang chủ và trang chi tiết phim có hero full-bleed nằm ngay dưới
   // header trong suốt nên không cần padding-top; các trang còn lại cần
   // chừa chỗ cho header fixed để nội dung không bị che mất.
@@ -47,6 +51,8 @@ export default function App() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <BackToTop />
+      <ToastContainer />
     </>
   );
 }

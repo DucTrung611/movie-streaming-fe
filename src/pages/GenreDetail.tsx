@@ -25,6 +25,10 @@ export default function GenreDetail() {
       title={slug.replace(/-/g, " ")}
       fetcher={fetcher}
       deps={[slug]}
+      breadcrumb={[
+        { label: "Thể loại", to: "/the-loai" },
+        { label: slug.replace(/-/g, " ") },
+      ]}
     />
   );
 }

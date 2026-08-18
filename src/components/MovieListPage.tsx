@@ -6,6 +6,7 @@ import MovieGrid from "./MovieGrid";
 import Pagination from "./Pagination";
 import Loader from "./Loader";
 import ErrorState from "./ErrorState";
+import Breadcrumb from "./Breadcrumb";
 import type { ListResponse } from "../types/movie";
 
 interface MovieListPageProps {
@@ -14,6 +15,8 @@ interface MovieListPageProps {
   fetcher: (page: number) => Promise<ListResponse>;
   deps?: React.DependencyList;
   filterSlot?: ReactNode;
+  /** Đường dẫn điều hướng (breadcrumb) — mốc cuối (trang hiện tại) nên bỏ `to`. */
+  breadcrumb?: { label: string; to?: string }[];
   /** Ẩn thanh phân trang — dùng khi fetcher lọc thêm ở client sau khi
    * server đã phân trang (vd. chọn nhiều thể loại cùng lúc), lúc đó
    * totalPages/currentPage từ server không còn phản ánh đúng số trang
@@ -40,6 +43,7 @@ export default function MovieListPage({
   deps = [],
   filterSlot,
   hidePagination = false,
+  breadcrumb,
 }: MovieListPageProps) {
   useDocumentTitle(title);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -81,6 +85,7 @@ export default function MovieListPage({
 
   return (
     <div className="section container">
+      {breadcrumb && <Breadcrumb items={breadcrumb} />}
       <div className="section-head">
         <div>
           {eyebrow && <span className="eyebrow">{eyebrow}</span>}
@@ -90,7 +95,7 @@ export default function MovieListPage({
 
       {filterSlot}
 
-      {loading && <Loader />}
+      {loading && <Loader variant="grid" count={12} />}
       {error && <ErrorState message={error.message} />}
       {!loading && !error && data && (
         <>

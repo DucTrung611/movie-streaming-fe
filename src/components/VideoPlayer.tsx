@@ -122,6 +122,9 @@ interface VideoPlayerProps {
    * hotlink, mạng chập chờn quá số lần thử lại...) — nơi gọi component
    * này có thể chuyển sang server/nguồn phát khác. */
   onFatalError?: () => void;
+  /** Gọi khi video phát xong hết (sự kiện "ended") — nơi gọi component
+   * này dùng để tự động chuyển sang tập tiếp theo. */
+  onEnded?: () => void;
 }
 
 const PLAYBACK_ERROR_MESSAGE =
@@ -133,6 +136,7 @@ export default function VideoPlayer({
   resumeTime,
   onProgress,
   onFatalError,
+  onEnded,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
@@ -306,13 +310,16 @@ export default function VideoPlayer({
         onProgress(currentTime, duration);
       }
     };
+    const handleEnded = () => onEnded?.();
     video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("pause", handlePause);
+    video.addEventListener("ended", handleEnded);
 
     return () => {
       handlePause(); // lưu vị trí lần cuối trước khi đổi tập/rời trang
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
       if (handleLoadedMetadata) {
         video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       }

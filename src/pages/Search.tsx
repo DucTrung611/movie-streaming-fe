@@ -26,6 +26,7 @@ export default function Search() {
       title={`“${keyword}”`}
       fetcher={fetcher}
       deps={[keyword]}
+      breadcrumb={[{ label: "Tìm kiếm", to: "/tim-kiem" }, { label: keyword }]}
     />
   );
 }

@@ -60,7 +60,7 @@ export default function RelatedMovies({ movie }: RelatedMoviesProps) {
         <h2>Phim cùng thể loại</h2>
       </div>
       {loading ? (
-        <Loader />
+        <Loader variant="row" count={6} />
       ) : (
         <MovieRow movies={related} cdnImageDomain={data?.cdnImageDomain || ""} />
       )}

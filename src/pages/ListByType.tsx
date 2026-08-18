@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useCallback } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { getMoviesByType, getGenres, getCountries, MOVIE_TYPES } from "../api/ophim";
 import MovieListPage from "../components/MovieListPage";
@@ -7,10 +7,48 @@ import FilterBar from "../components/FilterBar";
 import { sortMovies, type SortOption } from "../utils/sortMovies";
 import type { ListFilters } from "../types/movie";
 
+function setOrDelete(params: URLSearchParams, key: string, value: string | undefined) {
+  if (value) params.set(key, value);
+  else params.delete(key);
+}
+
+// Bộ lọc và cách sắp xếp lưu ở query string (?category=, ?country=, ...)
+// thay vì useState nội bộ — để khi người dùng chọn lọc rồi bấm vào xem
+// phim và back lại, URL (và trạng thái lọc trong đó) được trình duyệt
+// khôi phục nguyên vẹn thay vì component mount lại và mất hết bộ lọc.
 export default function ListByType() {
   const { type = "" } = useParams<{ type: string }>();
-  const [filters, setFilters] = useState<ListFilters>({});
-  const [sort, setSort] = useState<SortOption>("year-desc");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const filters: ListFilters = {
+    categories: searchParams.getAll("category").length
+      ? searchParams.getAll("category")
+      : undefined,
+    country: searchParams.get("country") || undefined,
+    year: searchParams.get("year") || undefined,
+    sort_lang: searchParams.get("sort_lang") || undefined,
+  };
+  const sort = (searchParams.get("sort") as SortOption) || "year-desc";
+
+  function handleFiltersChange(next: ListFilters) {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.delete("category");
+      (next.categories || []).forEach((slug) => params.append("category", slug));
+      setOrDelete(params, "country", next.country);
+      setOrDelete(params, "year", next.year);
+      setOrDelete(params, "sort_lang", next.sort_lang);
+      return params;
+    });
+  }
+
+  function handleSortChange(next: SortOption) {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      setOrDelete(params, "sort", next);
+      return params;
+    });
+  }
 
   const { data: genres } = useOphim(() => getGenres(), []);
   const { data: countries } = useOphim(() => getCountries(), []);
@@ -59,15 +97,16 @@ export default function ListByType() {
       fetcher={fetcher}
       deps={[type, JSON.stringify(filters), sort]}
       hidePagination={hidePagination}
+      breadcrumb={[{ label }]}
       filterSlot={
         <>
           <FilterBar
             genres={genres || []}
             countries={countries || []}
             value={filters}
-            onChange={setFilters}
+            onChange={handleFiltersChange}
             sort={sort}
-            onSortChange={setSort}
+            onSortChange={handleSortChange}
           />
           {hidePagination && (
             <p className="filter-bar__note">

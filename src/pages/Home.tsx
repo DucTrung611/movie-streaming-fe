@@ -57,7 +57,7 @@ function FeaturedHero({
   if (loading) {
     return (
       <section className="hero hero--empty">
-        <Loader />
+        <Loader variant="hero" />
       </section>
     );
   }
@@ -140,7 +140,7 @@ function TypeSection({
         </Link>
       </div>
 
-      {loading && <Loader />}
+      {loading && <Loader variant="row" count={6} />}
       {error && <ErrorState message={error.message} />}
       {!loading && !error && (
         <MovieRow

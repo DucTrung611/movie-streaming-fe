@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useOphim } from "../hooks/useOphim";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useContinueWatching } from "../hooks/useContinueWatching";
 import { getMovieDetail } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
+import { showToast } from "../utils/toast";
 import VideoPlayer from "../components/VideoPlayer";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
@@ -17,6 +18,7 @@ export default function Watch() {
   }>();
   const [searchParams] = useSearchParams();
   const serverIndex = Number(searchParams.get("server") || 0);
+  const navigate = useNavigate();
 
   // Chỉ phụ thuộc slug — chuyển tập/server không fetch lại toàn bộ phim.
   const { data, loading, error } = useOphim(() => getMovieDetail(slug), [slug]);
@@ -45,16 +47,28 @@ export default function Watch() {
     server?.server_data?.find((e) => e.slug === episodeSlug) ||
     server?.server_data?.[0];
 
-  // Chỉ đọc vị trí đã lưu 1 lần lúc mount/đổi phim — không phụ thuộc
-  // vào tiến trình đang được ghi định kỳ, tránh VideoPlayer bị tua lại.
+  // Chỉ đọc vị trí đã lưu 1 lần lúc mount/đổi tập — không phụ thuộc vào
+  // tiến trình đang được ghi định kỳ, tránh VideoPlayer bị tua lại.
+  // Lưu riêng theo từng tập (slug + episodeSlug) nên đổi tập/server
+  // không còn ghi đè mất tiến trình của tập khác.
   const resumeEntry = useMemo(
-    () => (movie ? getSavedProgress(movie.slug) : undefined),
-    [getSavedProgress, movie?.slug]
+    () => (movie && episode ? getSavedProgress(movie.slug, episode.slug) : undefined),
+    [getSavedProgress, movie?.slug, episode?.slug]
   );
-  const resumeTime =
-    resumeEntry && episode && resumeEntry.episodeSlug === episode.slug
-      ? resumeEntry.currentTime
-      : 0;
+  const resumeTime = resumeEntry?.currentTime ?? 0;
+
+  // Tập kế tiếp trong cùng server — dùng để tự động chuyển khi phát xong.
+  const nextEpisode = useMemo(() => {
+    if (!server?.server_data || !episode) return undefined;
+    const idx = server.server_data.findIndex((e) => e.slug === episode.slug);
+    return idx >= 0 ? server.server_data[idx + 1] : undefined;
+  }, [server, episode]);
+
+  const handleEnded = useCallback(() => {
+    if (!movie || !nextEpisode) return;
+    showToast(`Tự động chuyển sang ${nextEpisode.name}`, "info");
+    navigate(`/xem-phim/${movie.slug}/${nextEpisode.slug}?server=${serverIndex}`);
+  }, [movie, nextEpisode, serverIndex, navigate]);
 
   // Nếu phát HLS lỗi hẳn (link chết, bị chặn hotlink...), tự chuyển
   // sang link nhúng (embed) của cùng server thay vì để màn hình đứng
@@ -89,7 +103,7 @@ export default function Watch() {
     ]
   );
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader variant="hero" />;
   if (error) return <ErrorState message={error.message} />;
   if (!movie) return <ErrorState message="Không tìm thấy phim." />;
 
@@ -119,6 +133,7 @@ export default function Watch() {
             poster={poster}
             resumeTime={resumeTime}
             onProgress={handleProgress}
+            onEnded={handleEnded}
             onFatalError={() => {
               if (episode.link_embed) setForceEmbed(true);
             }}
