@@ -8,10 +8,17 @@ declare module "plyr" {
     onChange?: (quality: number) => void;
   }
 
+  interface PlyrFullscreenOptions {
+    enabled?: boolean;
+    fallback?: boolean;
+    iosNative?: boolean;
+  }
+
   interface PlyrOptions {
     controls?: string[];
     quality?: PlyrQualityOptions;
     i18n?: Record<string, unknown>;
+    fullscreen?: PlyrFullscreenOptions;
   }
 
   interface PlyrFullscreen {
