@@ -109,6 +109,12 @@ export default function Watch() {
       <div className="watch-page__player">
         {episode.link_m3u8 && !forceEmbed ? (
           <VideoPlayer
+            // key ép React tạo mới hẳn <video>/Hls.js/Plyr mỗi khi đổi
+            // tập, thay vì tái sử dụng cùng 1 thẻ <video> đã qua trạng
+            // thái "ended" — tái sử dụng dễ khiến trình phát bị đứng
+            // hình khi chuyển tập vì Hls.js/Plyr không reset sạch decoder
+            // trên chính element cũ.
+            key={`${serverIndex}:${episode.slug}`}
             src={episode.link_m3u8}
             poster={poster}
             resumeTime={resumeTime}
