@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ListFilters, NamedSlug } from "../types/movie";
 import type { SortOption } from "../utils/sortMovies";
+import { sortPinnedCountriesFirst } from "../utils/pinnedCountries";
 import "./FilterBar.css";
 
 const currentYear = new Date().getFullYear();
@@ -26,6 +27,10 @@ export default function FilterBar({
   const selectedCategories = value.categories || [];
   const [isGenreOpen, setIsGenreOpen] = useState(false);
   const genreRef = useRef<HTMLDivElement>(null);
+  const sortedCountries = useMemo(
+    () => sortPinnedCountriesFirst(countries),
+    [countries]
+  );
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -101,7 +106,7 @@ export default function FilterBar({
         onChange={(e) => set("country", e.target.value)}
       >
         <option value="">Tất cả quốc gia</option>
-        {countries.map((c) => (
+        {sortedCountries.map((c) => (
           <option key={c.slug} value={c.slug}>
             {c.name}
           </option>
