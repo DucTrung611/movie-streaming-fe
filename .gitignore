@@ -20,3 +20,5 @@ Thumbs.db
 *.sw?
 .vscode/*
 !.vscode/extensions.json
+.claude/
+.playwright-mcp/

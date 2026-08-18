@@ -8,6 +8,7 @@ import { getMovieDetail } from "../api/ophim";
 import { resolveImageUrl } from "../utils/image";
 import Loader from "../components/Loader";
 import ErrorState from "../components/ErrorState";
+import RelatedMovies from "../components/RelatedMovies";
 import "./MovieDetail.css";
 
 export default function MovieDetail() {
@@ -127,6 +128,8 @@ export default function MovieDetail() {
         </div>
         <EpisodeLists movie={movie} episodes={episodes} />
       </div>
+
+      <RelatedMovies movie={movie} />
     </div>
   );
 }

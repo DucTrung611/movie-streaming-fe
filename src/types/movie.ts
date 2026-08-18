@@ -83,9 +83,11 @@ export interface MovieType {
 }
 
 export interface ListFilters {
-  category?: string;
+  /** Thể loại được chọn — phần tử đầu dùng làm tham số lọc phía server,
+   * các phần tử còn lại dùng để lọc thêm ở client (server chỉ nhận 1 slug). */
+  categories?: string[];
   country?: string;
   year?: string;
   sort_lang?: string;
-  [key: string]: string | number | undefined;
+  [key: string]: string | string[] | number | undefined;
 }

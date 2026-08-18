@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import type { ListFilters, NamedSlug } from "../types/movie";
+import type { SortOption } from "../utils/sortMovies";
 import "./FilterBar.css";
 
 const currentYear = new Date().getFullYear();
@@ -9,8 +11,8 @@ interface FilterBarProps {
   countries?: NamedSlug[];
   value: ListFilters;
   onChange: (value: ListFilters) => void;
-  sort?: "desc" | "asc";
-  onSortChange?: (sort: "desc" | "asc") => void;
+  sort?: SortOption;
+  onSortChange?: (sort: SortOption) => void;
 }
 
 export default function FilterBar({
@@ -18,36 +20,81 @@ export default function FilterBar({
   countries = [],
   value,
   onChange,
-  sort = "desc",
+  sort = "year-desc",
   onSortChange,
 }: FilterBarProps) {
+  const selectedCategories = value.categories || [];
+  const [isGenreOpen, setIsGenreOpen] = useState(false);
+  const genreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (genreRef.current && !genreRef.current.contains(e.target as Node)) {
+        setIsGenreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   function set(field: keyof ListFilters, val: string) {
-    onChange({ ...value, [field]: val });
+    onChange({ ...value, [field]: val || undefined });
   }
+
+  function toggleCategory(slug: string) {
+    const next = selectedCategories.includes(slug)
+      ? selectedCategories.filter((s) => s !== slug)
+      : [...selectedCategories, slug];
+    onChange({ ...value, categories: next.length ? next : undefined });
+  }
+
+  const hasActiveFilters =
+    selectedCategories.length > 0 || Boolean(value.country) || Boolean(value.year) || Boolean(value.sort_lang);
 
   return (
     <div className="filter-bar">
       {onSortChange && (
         <select
           value={sort}
-          onChange={(e) => onSortChange(e.target.value as "desc" | "asc")}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
         >
-          <option value="desc">Năm phát hành: Mới nhất</option>
-          <option value="asc">Năm phát hành: Cũ nhất</option>
+          <option value="year-desc">Năm phát hành: Mới nhất</option>
+          <option value="year-asc">Năm phát hành: Cũ nhất</option>
+          <option value="name-asc">Tên phim: A-Z</option>
+          <option value="name-desc">Tên phim: Z-A</option>
         </select>
       )}
 
-      <select
-        value={value.category || ""}
-        onChange={(e) => set("category", e.target.value)}
-      >
-        <option value="">Tất cả thể loại</option>
-        {genres.map((g) => (
-          <option key={g.slug} value={g.slug}>
-            {g.name}
-          </option>
-        ))}
-      </select>
+      <div className="filter-multiselect" ref={genreRef}>
+        <button
+          type="button"
+          className={`filter-multiselect__trigger${
+            selectedCategories.length ? " is-active" : ""
+          }`}
+          onClick={() => setIsGenreOpen((v) => !v)}
+          aria-expanded={isGenreOpen}
+        >
+          Thể loại{selectedCategories.length ? ` (${selectedCategories.length})` : ""}
+          <span className="filter-multiselect__caret">▾</span>
+        </button>
+        {isGenreOpen && (
+          <div className="filter-multiselect__panel" role="listbox" aria-multiselectable>
+            {genres.map((g) => (
+              <label key={g.slug} className="filter-multiselect__option">
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(g.slug)}
+                  onChange={() => toggleCategory(g.slug)}
+                />
+                {g.name}
+              </label>
+            ))}
+            {genres.length === 0 && (
+              <p className="filter-multiselect__empty">Không có thể loại.</p>
+            )}
+          </div>
+        )}
+      </div>
 
       <select
         value={value.country || ""}
@@ -82,6 +129,12 @@ export default function FilterBar({
         <option value="thuyet-minh">Thuyết minh</option>
         <option value="long-tieng">Lồng tiếng</option>
       </select>
+
+      {hasActiveFilters && (
+        <button type="button" className="filter-bar__clear" onClick={() => onChange({})}>
+          Xoá lọc
+        </button>
+      )}
     </div>
   );
 }
