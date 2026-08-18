@@ -47,21 +47,35 @@ export default function ListByType() {
   const label =
     MOVIE_TYPES.find((t) => t.slug === type)?.label || "Danh sách phim";
 
+  // Lọc thêm (AND) ở client sau khi server đã phân trang khiến
+  // totalPages/currentPage của server không còn đúng cho tập kết quả đã
+  // lọc — ẩn phân trang trong trường hợp này thay vì hiện số trang sai.
+  const hidePagination = extraCategories.length > 0;
+
   return (
     <MovieListPage
       eyebrow="Danh mục"
       title={label}
       fetcher={fetcher}
       deps={[type, JSON.stringify(filters), sort]}
+      hidePagination={hidePagination}
       filterSlot={
-        <FilterBar
-          genres={genres || []}
-          countries={countries || []}
-          value={filters}
-          onChange={setFilters}
-          sort={sort}
-          onSortChange={setSort}
-        />
+        <>
+          <FilterBar
+            genres={genres || []}
+            countries={countries || []}
+            value={filters}
+            onChange={setFilters}
+            sort={sort}
+            onSortChange={setSort}
+          />
+          {hidePagination && (
+            <p className="filter-bar__note">
+              Đang lọc theo nhiều thể loại — chỉ hiện kết quả khớp trong
+              phạm vi trang đầu tiên từ server, không phân trang tiếp.
+            </p>
+          )}
+        </>
       }
     />
   );

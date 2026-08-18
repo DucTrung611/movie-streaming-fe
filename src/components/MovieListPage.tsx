@@ -14,6 +14,11 @@ interface MovieListPageProps {
   fetcher: (page: number) => Promise<ListResponse>;
   deps?: React.DependencyList;
   filterSlot?: ReactNode;
+  /** Ẩn thanh phân trang — dùng khi fetcher lọc thêm ở client sau khi
+   * server đã phân trang (vd. chọn nhiều thể loại cùng lúc), lúc đó
+   * totalPages/currentPage từ server không còn phản ánh đúng số trang
+   * của tập kết quả đã lọc, hiện phân trang ra sẽ gây hiểu nhầm. */
+  hidePagination?: boolean;
 }
 
 /**
@@ -34,6 +39,7 @@ export default function MovieListPage({
   fetcher,
   deps = [],
   filterSlot,
+  hidePagination = false,
 }: MovieListPageProps) {
   useDocumentTitle(title);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -89,11 +95,13 @@ export default function MovieListPage({
       {!loading && !error && data && (
         <>
           <MovieGrid movies={data.items} cdnImageDomain={data.cdnImageDomain} />
-          <Pagination
-            currentPage={data.currentPage}
-            totalPages={data.totalPages}
-            onChange={handlePageChange}
-          />
+          {!hidePagination && (
+            <Pagination
+              currentPage={data.currentPage}
+              totalPages={data.totalPages}
+              onChange={handlePageChange}
+            />
+          )}
         </>
       )}
     </div>
