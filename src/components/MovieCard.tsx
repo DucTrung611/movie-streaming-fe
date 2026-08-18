@@ -12,9 +12,14 @@ interface MovieCardProps {
     duration?: number;
   };
   cdnImageDomain: string;
+  priority?: boolean;
 }
 
-export default function MovieCard({ movie, cdnImageDomain }: MovieCardProps) {
+export default function MovieCard({
+  movie,
+  cdnImageDomain,
+  priority = false,
+}: MovieCardProps) {
   const poster = resolveImageUrl(
     movie.poster_url || movie.thumb_url,
     cdnImageDomain
@@ -37,7 +42,12 @@ export default function MovieCard({ movie, cdnImageDomain }: MovieCardProps) {
     <Link to={linkTo} className="movie-card">
       <div className="movie-card__poster">
         {poster ? (
-          <img src={poster} alt={movie.name} loading="lazy" />
+          <img
+            src={poster}
+            alt={movie.name}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+          />
         ) : (
           <div className="movie-card__poster movie-card__poster--empty" />
         )}

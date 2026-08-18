@@ -20,7 +20,7 @@ export default function Favorites() {
           trang phim để lưu vào đây.
         </p>
       ) : (
-        <MovieGrid movies={favorites} cdnImageDomain="" />
+        <MovieGrid movies={favorites} cdnImageDomain="" priorityCount={6} />
       )}
     </div>
   );

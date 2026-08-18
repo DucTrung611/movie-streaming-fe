@@ -94,7 +94,11 @@ export default function MovieListPage({
       {error && <ErrorState message={error.message} />}
       {!loading && !error && data && (
         <>
-          <MovieGrid movies={data.items} cdnImageDomain={data.cdnImageDomain} />
+          <MovieGrid
+            movies={data.items}
+            cdnImageDomain={data.cdnImageDomain}
+            priorityCount={6}
+          />
           {!hidePagination && (
             <Pagination
               currentPage={data.currentPage}

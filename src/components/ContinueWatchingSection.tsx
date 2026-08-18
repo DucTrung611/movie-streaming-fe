@@ -15,7 +15,7 @@ export default function ContinueWatchingSection() {
           <h2>Tiếp tục xem</h2>
         </div>
       </div>
-      <MovieRow movies={items} cdnImageDomain="" />
+      <MovieRow movies={items} cdnImageDomain="" priorityCount={6} />
     </section>
   );
 }

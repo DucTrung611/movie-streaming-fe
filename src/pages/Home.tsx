@@ -28,8 +28,8 @@ export default function Home() {
       <div className="home-rows">
         <ContinueWatchingSection />
 
-        {SECTIONS.map((s) => (
-          <TypeSection key={s.type} {...s} />
+        {SECTIONS.map((s, index) => (
+          <TypeSection key={s.type} {...s} priority={index === 0} />
         ))}
       </div>
     </div>
@@ -73,10 +73,13 @@ function FeaturedHero({
   if (!featured) return null;
 
   return (
-    <section
-      className="hero"
-      style={{ backgroundImage: `url(${backdrop})` }}
-    >
+    <section className="hero">
+      <img
+        className="hero__backdrop"
+        src={backdrop}
+        alt=""
+        fetchPriority="high"
+      />
       <div className="hero__scrim" />
       <div className="hero__scrim hero__scrim--side" />
       <div className="container hero__content">
@@ -113,10 +116,12 @@ function TypeSection({
   type,
   eyebrow,
   title,
+  priority = false,
 }: {
   type: string;
   eyebrow: string;
   title: string;
+  priority?: boolean;
 }) {
   const { data, loading, error } = useOphim(
     () => getMoviesByType(type, { page: 1, limit: 12 }),
@@ -141,6 +146,7 @@ function TypeSection({
         <MovieRow
           movies={sortMoviesByYear(data!.items).slice(0, 12)}
           cdnImageDomain={data!.cdnImageDomain}
+          priorityCount={priority ? 6 : 0}
         />
       )}
     </section>
